@@ -4,14 +4,13 @@
 website:
   title: "Khoi Tran"                              
   description: "PhD Student @ CWRU Pathology"
-  image: img/my_image.jpg
+  image: img/profile_pic.jpg
   
-  favicon: img/favicon.png
   
   # start of the navigation bar at the top of the website
   navbar:
     pinned: true
-    logo: /img/logo.png
+    
     
     # your sub-pages
     left:

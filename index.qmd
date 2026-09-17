@@ -17,7 +17,7 @@ title: "Khoi Tran"
 ---
 
 ::: {#about-block}
-
+:::
 # Welcome to my website!
 
 I am Khoi Tran, a current Pathology PhD student in the Department of Pathology at Case Western Reserve University's School of Medicine. My fascination for the cell and the intricate network that regulates cellular processes has driven my dedication to understanding molecular drivers and mechanisms of neurodegenerative diseases. 
@@ -31,7 +31,7 @@ PhD in Pathology | Jun. 2025 - present
 
 Case Western Reserve University | Cleveland, OH
 B.A in Biochemistry | Aug. 2021 - May 2025
-:::
+
 ```{=html}
 <div  style="margin: 30px; text-align: center;">
 <a class="btn btn-primary" href="https://www.marvinschmitt.com/blog/website-tutorial-quarto/" role="button" target="_blank" style="padding: 15px 30px;">View the tutorial for this template (+ download link)</a>
