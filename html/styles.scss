@@ -30,7 +30,7 @@ $primary:   $greengrey!default;
 $secondary: $green !default;
 $success:   $green !default;
 $info:      $cyan !default;
-$warning:   $orange !default;
+$warning:   $red !default;
 $danger:    $red !default;
 $light:     $gray-400 !default;
 $dark:      $black !default;
@@ -52,11 +52,11 @@ $code-bg: $gray-200 !default;
 $code-color: $gray-900 !default;
 
 // TOC
-$toc-color: $orange;
+$toc-color: $red;
 $toc-font-size: 1em;
 
 // Code copy
-$btn-code-copy-color-active: $orange !default;
+$btn-code-copy-color-active: $blue !default;
 
 
 /*-- scss:rules --*/
