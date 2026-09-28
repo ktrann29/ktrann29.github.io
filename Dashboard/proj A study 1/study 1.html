@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="khoi tran">
+
+<title>study 1</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="study 1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="study 1_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="study 1_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="study 1_files/libs/quarto-html/popper.min.js"></script>
+<script src="study 1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="study 1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="study 1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="study 1_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="study 1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="study 1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="study 1_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="study 1_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+<link href="study 1_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">study 1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>khoi tran </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>conf_level <span class="ot">&lt;-</span> <span class="fl">0.90</span>   </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> conf_level</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_light</span>()) </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">comment=</span><span class="cn">NA</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="set-up-data-import" class="level1">
+<h1>Set Up &amp; Data Import</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nhanesA)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Here, I pull in P_DEMO data from nhanes and save it</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>demo<span class="ot">&lt;-</span><span class="fu">nhanes</span>(<span class="st">"P_DEMO"</span>, <span class="at">translated =</span> <span class="cn">FALSE</span>)<span class="sc">|&gt;</span><span class="fu">tibble</span>() </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>glu<span class="ot">&lt;-</span><span class="fu">nhanes</span>(<span class="st">"P_GLU"</span>, <span class="at">translated =</span> <span class="cn">FALSE</span>)<span class="sc">|&gt;</span><span class="fu">tibble</span>()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>diq<span class="ot">&lt;-</span><span class="fu">nhanes</span>(<span class="st">"P_DIQ"</span>, <span class="at">translated =</span> <span class="cn">FALSE</span>)<span class="sc">|&gt;</span><span class="fu">tibble</span>()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>alq<span class="ot">&lt;-</span><span class="fu">nhanes</span>(<span class="st">"P_ALQ"</span>, <span class="at">translated =</span> <span class="cn">FALSE</span>)<span class="sc">|&gt;</span><span class="fu">tibble</span>()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Saving the RDS</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(demo, <span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DEMO.Rds"</span>) </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(glu, <span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_GLU.Rds"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(diq,<span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DIQ.Rds"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(alq, <span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_ALQ.Rds"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#reading data as tibble</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>demo<span class="ot">&lt;-</span><span class="fu">readRDS</span>(<span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DEMO.Rds"</span>) </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>glu<span class="ot">&lt;-</span><span class="fu">readRDS</span>(<span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_GLU.Rds"</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>diq<span class="ot">&lt;-</span><span class="fu">readRDS</span>(<span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DIQ.Rds"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>alq<span class="ot">&lt;-</span><span class="fu">readRDS</span>(<span class="st">"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_ALQ.Rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="data-cleaning" class="level1">
+<h1>Data Cleaning</h1>
+<p>For all analyses, I will take data from the demographic (P_DEMO), diabetes (P_DIQ), glucose levels (P_GLU), and alcohol consumption (P_ALQ) datasets. I first merge all four datasets into a single dataframe called all_raw. Then I filter the raw, merged dataframe to include only participants who have lab and questionnaire results and are adults between the ages of 21 and 79. This filtered, merged dataframe is named all_clean, with a total of 7,853 unique observations.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>all_raw <span class="ot">&lt;-</span> demo <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(diq, <span class="at">by =</span> <span class="st">"SEQN"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(glu, <span class="at">by =</span> <span class="st">"SEQN"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(alq, <span class="at">by =</span> <span class="st">"SEQN"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>all_clean <span class="ot">&lt;-</span> all_raw <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(RIDSTATR <span class="sc">==</span> <span class="dv">2</span>, RIDAGEYR <span class="sc">&gt;=</span> <span class="dv">21</span>, RIDAGEYR <span class="sc">&lt;=</span> <span class="dv">79</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(all_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7853</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(all_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7853</code></pre>
+</div>
+</div>
+<section id="analysis-a" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-a">Analysis A</h2>
+<p>In this analysis, I want to look at the difference between reported and recommended LDL amongst diabetic subjects who take diabetic pills. Here, I use the dataset DIQ070 containing diabetic subjects and select subjects encoded by 1 (DIQ070==1), indicating they’re diabetic and currently taking diabetic pills. Then, I remove the reported and recommended LDL values from subjects who refused to answer, don’t know, or have missing values for whether they take diabetic pills using the mutate function. This gives me the diqA dataframe that includes the reported and recommended LDL values from diabetic subjects who take diabetic pills.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>diqA <span class="ot">&lt;-</span> all_clean <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DIQ070 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span>                </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">reported_ldl =</span> DID320 <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">5555</span>) <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">6666</span>) <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">7777</span>) <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">9999</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">goal_ldl     =</span> DID330 <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">6666</span>) <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">7777</span>) <span class="sc">|&gt;</span> <span class="fu">na_if</span>(<span class="dv">9999</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(reported_ldl), <span class="sc">!</span><span class="fu">is.na</span>(goal_ldl))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(diqA<span class="sc">$</span>reported_ldl)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 61</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(diqA<span class="sc">$</span>goal_ldl)       </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 26</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(diqA)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 76</code></pre>
+</div>
+</div>
+</section>
+<section id="analysis-b" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-b">Analysis B</h2>
+<p>In this analysis, I want to compare the fasting glucose levels of non-diabetic subjects in males vs.&nbsp;females. To do this, I filtered out non-diabetic subjects from the DIQ010 dataset and selected only subjects with available fasting glucose levels from the LBXGLU dataset. Then, I divided this cohort into subgroups by sex.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>diqB <span class="ot">&lt;-</span> all_clean <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    DIQ010 <span class="sc">==</span> <span class="dv">2</span>,                 </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    RIAGENDR <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),      </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(LBXGLU)              </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">case_when</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      RIAGENDR <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Male"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>      RIAGENDR <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Female"</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>diqB <span class="sc">|&gt;</span> <span class="fu">count</span>(sex)        </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  sex        n
+  &lt;chr&gt;  &lt;int&gt;
+1 Female  1588
+2 Male    1409</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(diqB<span class="sc">$</span>LBXGLU) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 122</code></pre>
+</div>
+</div>
+</section>
+<section id="analysis-c" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-c">Analysis C</h2>
+<p>In this analysis, I want to compare baseline fasting glucose levels between groups with varying alcohol consumption levels. The ALQ142 dataset classifies subjects into different groups based on how many days they have had 4 or 5 drinks in the past 12 months. I merged these groups together to create 4 broader sub-groups that signify the subjects’ drinking habits. The groups include: social drinker, intermediate, and heavy drinker, with social drinker having the fewest days with 4 or 5 drinks and heavy drinker having the most. For the “non-drinker” control group, I used subjects that responded “Never” in the ALQ121 dataset, which asks how often they drank alcoholic beverages in the past 12 months.</p>
+<p>Below is the code where I filtered for only non-diabetic subjects and set the criteria for my four subgroups.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>diqC <span class="ot">&lt;-</span> all_clean <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DIQ010<span class="sc">==</span><span class="dv">2</span>)<span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">alcohol_group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      ALQ121 <span class="sc">==</span> <span class="dv">0</span>        <span class="sc">~</span> <span class="st">"Nondrinker"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>      ALQ142 <span class="sc">%in%</span> <span class="dv">7</span><span class="sc">:</span><span class="dv">10</span>    <span class="sc">~</span> <span class="st">"Social drinker"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      ALQ142 <span class="sc">%in%</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>     <span class="sc">~</span> <span class="st">"Intermediate"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>      ALQ142 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>     <span class="sc">~</span> <span class="st">"Heavy drinker"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>                <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">alcohol_group =</span> <span class="fu">factor</span>(alcohol_group,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Nondrinker"</span>, <span class="st">"Social drinker"</span>, <span class="st">"Intermediate"</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Heavy drinker"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(alcohol_group))</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>glu_C <span class="ot">&lt;-</span> diqC <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(LBXGLU))</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>glu_C <span class="sc">|&gt;</span> <span class="fu">count</span>(alcohol_group)  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  alcohol_group      n
+  &lt;fct&gt;          &lt;int&gt;
+1 Nondrinker       480
+2 Social drinker   606
+3 Intermediate     278
+4 Heavy drinker     95</code></pre>
+</div>
+</div>
+</section>
+<section id="analysis-d" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-d">Analysis D</h2>
+<p>In this analysis, my two categorical variables are sex (male or female) and retinopathy status (with or without) in diabetic subjects. To create the cohort groups, I first filter for only diabetic subjects from those who responded “Yes” in the DIQ010 dataset. For the sex variable, I use the mutate function to create the male and female subgroups based on their encoded response in the RIAGENDR dataset. The same method is used on the DIQ080 dataset to create the with- and without-retinopathy subgroups.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>diabetics <span class="ot">&lt;-</span> all_clean <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DIQ010 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span>                       </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DIQ080 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">factor</span>(RIAGENDR, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">retinopathy =</span> <span class="fu">factor</span>(DIQ080, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Yes"</span>, <span class="st">"No"</span>))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>tab_sex <span class="ot">&lt;-</span> <span class="fu">table</span>(diabetics<span class="sc">$</span>retinopathy, diabetics<span class="sc">$</span>sex)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>tab_sex</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     
+      Male Female
+  Yes  115    114
+  No   517    429</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="codebook" class="level1">
+<h1>Codebook</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Variable</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><code>diabetics</code></td>
+<td style="text-align: left;">subjects with reported diabetes</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><code>sex</code></td>
+<td style="text-align: left;">female or male</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><code>nondrinker</code></td>
+<td style="text-align: left;">have not had alcohol in the past 12 months</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><code>occasional_drinker</code></td>
+<td style="text-align: left;">have had 4 or 5 drinks/day once a month to 1-2 times in the past 12 months</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><code>social_drinker</code></td>
+<td style="text-align: left;">have had 4 or 5 drinks/day 2 times a week to 2-3 times a month in the past 12 months</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><code>heavy_drinker</code></td>
+<td style="text-align: left;">have had 4 or 5 drinks/day every day to 3-4 times a week in the past 12 months</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><code>retinopathy</code></td>
+<td style="text-align: left;">Retinopathy status of diabetic subjects. Yes = have retinopathy; No = does not have retinopathy</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><code>reported_ldl</code></td>
+<td style="text-align: left;">LDL level reported by subjects (mg/dL)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><code>goal_ldl</code></td>
+<td style="text-align: left;">LDL level recommended by doctor (mg/dL)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-a-comparing-2-means-with-paired-samples" class="level1">
+<h1>Analysis A: Comparing 2 Means with Paired Samples</h1>
+<p><em>Among diabetics who take diabetic pills, is there a difference between their reported LDL cholesterol and the LDL goal their doctor recommended?</em></p>
+<section id="research-question" class="level2">
+<h2 class="anchored" data-anchor-id="research-question">Research question</h2>
+<p>Diabetes patients are prescribed diabetic pills to control their blood sugar levels. This can potentially modulate other clinically relevant measurements such as total serum LDL, which is heightened in diabetes. Hence, it is interesting to examine whether, among diabetics who take diabetic pills, <strong>there is a difference between their reported LDL levels and the ideal LDL goal recommended by their doctor.</strong></p>
+</section>
+<section id="about-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-data">About the data</h2>
+<p>The comparison is being made between reported and recommended LDL levels (in mg/dL). As shown earlier, the data have been cleaned to include only diabetic subjects who are taking diabetic pills and have reported their most recent LDL levels. As it has been shown that LDL levels tend to rise with age, it is important that the relative age between all subjects for this analysis is evenly matched and is not skewed towards either direction.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ageA<span class="ot">&lt;-</span>mosaic<span class="sc">::</span><span class="fu">favstats</span>(<span class="sc">~</span> RIDAGEYR, <span class="at">data =</span> diqA) <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">IQR =</span> Q3 <span class="sc">-</span> Q1, <span class="at">.after =</span> Q3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'mosaic':
+  method                           from   
+  fortify.SpatialPolygonsDataFrame ggplot2</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ageA)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 4%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">IQR</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">missing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">58.75</td>
+<td style="text-align: right;">65.5</td>
+<td style="text-align: right;">71.25</td>
+<td style="text-align: right;">12.5</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">64.06579</td>
+<td style="text-align: right;">10.14999</td>
+<td style="text-align: right;">76</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>med_age <span class="ot">&lt;-</span> <span class="fu">median</span>(diqA<span class="sc">$</span>RIDAGEYR)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ageA<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diqA, <span class="fu">aes</span>(<span class="at">x =</span> RIDAGEYR)) <span class="sc">+</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">fill =</span> <span class="st">"darkgreen"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> med_age, <span class="at">color =</span> <span class="st">"red"</span>,<span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> med_age, <span class="at">y =</span> <span class="cn">Inf</span>,<span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Median = "</span>, med_age),<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">hjust =</span> <span class="fl">1.1</span>, <span class="at">vjust =</span> <span class="fl">2.3</span>, <span class="at">size =</span> <span class="fl">4.5</span>) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age (years)"</span>, <span class="at">y =</span> <span class="st">"Count"</span>,<span class="at">title =</span> <span class="st">"Age distribution of Subjects"</span>) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text    =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ageA</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisA_data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the summary and histogram showing the age distribution of the subjects in this analysis, it is clear that the histogram is slightly left skewed with the median age of 65.5 years. This is important to keep in mind for interpreting the results as age is a known factor influencing LDL levels.</p>
+<p>To assess normality of the reported LDL distribution, I have made the following plots:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>qA<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diqA, <span class="fu">aes</span>(<span class="at">x =</span> reported_ldl)) <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),<span class="at">bins =</span> <span class="dv">10</span>, <span class="at">fill =</span> <span class="st">"darkgreen"</span>,<span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean =</span> <span class="fu">mean</span>(diqA<span class="sc">$</span>reported_ldl),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd =</span> <span class="fu">sd</span>(diqA<span class="sc">$</span>reported_ldl)),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"red"</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Histogram of Reported LDL Values"</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Reported LDL"</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>qqA<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diqA, <span class="fu">aes</span>(<span class="at">sample =</span> reported_ldl)) <span class="sc">+</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>() <span class="sc">+</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>() <span class="sc">+</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Q-Q Plot of Reported LDL Values"</span>,</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Theoretical Quantiles"</span>,</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sample Quantiles"</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>bA<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diqA, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> reported_ldl)) <span class="sc">+</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"darkgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">width =</span> <span class="fl">0.4</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Reported LDL (mg/dL)"</span>,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Boxplot of Reported LDL"</span>)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>combinedA<span class="ot">&lt;-</span>qA<span class="sc">+</span>(qqA<span class="sc">/</span>bA)<span class="sc">&amp;</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">8</span>),</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">10</span>, <span class="dv">20</span>))  </span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>combinedA</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisA_data2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The S-shaped curve from the q-q plot suggests a uniform distribution. However, based on the histogram and boxplot, the distribution of reported LDL values resembles a right-skewed distribution. The curve at the right end of the tail is likely due to extreme outliers illustrated by the histogram and boxplot. From these plots, we cannot assume normality of the reported LDL values.</p>
+</section>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
+<p>As shown in the data exploration part, the distribution of reported LDL values is right-skewed. Due to this, comparing the medians of the two paired samples (reported vs.&nbsp;recommended LDL) will be more appropriate, as the median is more resistant to outliers than the mean.</p>
+<p>In addition, even though we cannot assume normality, the sample sizes for both populations are larger than 30. The paired t-test cannot compare medians, so the bootstrap method is more appropriate. I created the variable diqA_diff to generate the difference between the reported and recommended LDL values, then used the bootstrap method to compare the median difference.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>diqA_diff <span class="ot">&lt;-</span> diqA <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">diff =</span> reported_ldl <span class="sc">-</span> goal_ldl)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">431</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>boot_med <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">10000</span>, <span class="fu">median</span>(<span class="fu">sample</span>(diqA_diff<span class="sc">$</span>diff, <span class="at">replace =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Observed median difference</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(diqA_diff<span class="sc">$</span>diff),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Lower 90% CI</span><span class="st">`</span>               <span class="ot">=</span> <span class="fu">quantile</span>(boot_med, <span class="fl">0.05</span>),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Upper 90% CI</span><span class="st">`</span>               <span class="ot">=</span> <span class="fu">quantile</span>(boot_med, <span class="fl">0.95</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Observed median difference</th>
+<th style="text-align: right;">Lower 90% CI</th>
+<th style="text-align: right;">Upper 90% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>bA<span class="ot">&lt;-</span>diqA <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(reported_ldl, goal_ldl), <span class="at">names_to =</span> <span class="st">"type"</span>, <span class="at">values_to =</span> <span class="st">"ldl"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">recode</span>(type, <span class="at">reported_ldl =</span> <span class="st">"Reported LDL"</span>, <span class="at">goal_ldl =</span> <span class="st">"Recommended LDL"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> type, <span class="at">y =</span> ldl, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Reported LDL"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"Recommended LDL"</span> <span class="ot">=</span> <span class="st">"darkgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"LDL levels (mg/dL)"</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>bA</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisA_test-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>From the resulting table, the interval includes 0. Therefore, at 90% confidence level, there is no difference in the median between reported and recommended LDL. In the context of the central question, this means that the diabetic pill does have a positive effect in helping diabetic patients manage LDL levels, which is one of the main clinical outcomes in diabetes.</p>
+</section>
+</section>
+<section id="analysis-b-comparing-2-means-with-independent-samples" class="level1">
+<h1>Analysis B: Comparing 2 Means with Independent Samples</h1>
+<p><em>Do men have higher baseline fasting plasma glucose levels than women?</em></p>
+<section id="research-question-1" class="level2">
+<h2 class="anchored" data-anchor-id="research-question-1">Research question</h2>
+<p>It has been shown that diabetes is more prevalent in the male than female population in the US. Fasting plasma glucose levels are one of the prominent clinical measurements to infer an individual’s risk of having diabetes. Hence, it is interesting to examine whether there is an intrinsic sex difference in fasting plasma glucose levels. In this analysis, I want to examine <strong>whether men have higher baseline fasting plasma glucose levels than women?</strong></p>
+</section>
+<section id="about-the-data-1" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-data-1">About the data</h2>
+<p>In this analysis, I’m comparing fasting plasma glucose levels between non-diabetic men and women. As age has not been shown to influence fasting glucose levels, the age distribution between the subjects of this analysis is not a concern.</p>
+<p>To assess normality of the distributions, I made the following plots:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>group_stats <span class="ot">&lt;-</span> diqB <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_glu =</span> <span class="fu">mean</span>(LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">sd_glu   =</span> <span class="fu">sd</span>(LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>glu_range <span class="ot">&lt;-</span> <span class="fu">range</span>(diqB<span class="sc">$</span>LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>norm_curves <span class="ot">&lt;-</span> group_stats <span class="sc">|&gt;</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reframe</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> sex,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">glucose =</span> <span class="fu">seq</span>(glu_range[<span class="dv">1</span>], glu_range[<span class="dv">2</span>], <span class="at">length.out =</span> <span class="dv">200</span>),</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">density =</span> <span class="fu">dnorm</span>(glucose, <span class="at">mean =</span> mean_glu, <span class="at">sd =</span> sd_glu))</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>qB <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(diqB, <span class="fu">aes</span>(<span class="at">x =</span> LBXGLU)) <span class="sc">+</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">3</span>,</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"darkgreen"</span>, <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span>         </span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> norm_curves, <span class="fu">aes</span>(<span class="at">x =</span> glucose, <span class="at">y =</span> density),</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> sex, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Fasting plasma glucose (mg/dL)"</span>, <span class="at">y =</span> <span class="st">"Density"</span>,</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Fasting Glucose Distribution by Sex"</span>) <span class="sc">+</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">46</span>, <span class="dv">422</span>))</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>qqB <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(diqB, <span class="fu">aes</span>(<span class="at">sample =</span> LBXGLU)) <span class="sc">+</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>(<span class="at">size=</span><span class="fl">0.6</span>, <span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span> <span class="fu">stat_qq_line</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> sex, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Theoretical quantiles"</span>,</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Sample quantiles</span><span class="sc">\n</span><span class="st">(fasting glucose, mg/dL)"</span>,   </span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Q-Q Plot of Fasting Glucose by Sex"</span>)</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>bB<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diqB, <span class="fu">aes</span>(<span class="at">x =</span> sex, <span class="at">y =</span> LBXGLU, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Male"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"Female"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) <span class="sc">+</span></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Fasting plasma glucose (mg/dL)"</span>,</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Fasting Glucose by Sex"</span>)<span class="sc">+</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>combinedB<span class="ot">&lt;-</span>bB<span class="sc">/</span>(qqB<span class="sc">+</span>qB)</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>combinedB <span class="sc">&amp;</span></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">8</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">8</span>),</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisB_norm-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As clearly shown by the boxplot and q-q plot, both distributions are strongly right-skewed. This can be due to undiagnosed diabetics who are not reported in the questionnaire. Due to this, we cannot assume normality for either distribution.</p>
+</section>
+<section id="analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-1">Analysis</h2>
+<p>As shown in the data exploration part, we cannot assume normality. However, since the sample sizes for both populations are larger than 30, we can still perform the t-test to compare the means of the two independent samples.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>diqB_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(LBXGLU <span class="sc">~</span> sex, <span class="at">data =</span> diqB, <span class="at">conf.level =</span> conf_level)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>diqB_test</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  LBXGLU by sex
+t = -3.7466, df = 2894.9, p-value = 0.0001827
+alternative hypothesis: true difference in means between group Female and group Male is not equal to 0
+90 percent confidence interval:
+ -3.902396 -1.520746
+sample estimates:
+mean in group Female   mean in group Male 
+            102.3665             105.0781 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>anaB<span class="ot">&lt;-</span><span class="fu">tidy</span>(diqB_test) <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mean, Female</span><span class="st">`</span>        <span class="ot">=</span> estimate1,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mean, Male</span><span class="st">`</span>          <span class="ot">=</span> estimate2,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lower 90% CI</span><span class="st">`</span>        <span class="ot">=</span> conf.low,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Upper 90% CI</span><span class="st">`</span>        <span class="ot">=</span> conf.high,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p-value</span><span class="st">`</span>             <span class="ot">=</span> p.value)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(anaB, <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>,<span class="dv">4</span>), <span class="at">align =</span> <span class="st">"c"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Mean, Female</th>
+<th style="text-align: center;">Mean, Male</th>
+<th style="text-align: center;">Lower 90% CI</th>
+<th style="text-align: center;">Upper 90% CI</th>
+<th style="text-align: center;">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">102.37</td>
+<td style="text-align: center;">105.08</td>
+<td style="text-align: center;">-3.9</td>
+<td style="text-align: center;">-1.52</td>
+<td style="text-align: center;">2e-04</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(diqB, <span class="fu">aes</span>(<span class="at">x =</span> sex, <span class="at">y =</span> LBXGLU, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>()<span class="sc">+</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>)<span class="sc">+</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Fasting plasma glucose (mg/dL)"</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Fasting Plasma Glucose in Non-Diabetic Subjects by Sex"</span>) <span class="sc">+</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisB-test-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<p>The results indicate that men do have a higher mean baseline fasting glucose level compared to women (105.1 vs 102.4 mg/dL). The resulting interval from the t-test does not include 0. Therefore, at 90% confidence level, there is a statistically significant difference in the mean baseline fasting glucose level between non-diabetic men and women. This is interesting because it suggests that the difference in baseline fasting glucose levels might act as an intrinsic factor contributing to diabetes being more prevalent in the male population compared to the female population.</p>
+<p>However, this analysis only loosely supports this hypothesis, as the glucose levels on the higher end of the distribution might be due to undiagnosed diabetes in both groups. A controlled experiment using age-matched subjects with similar fasting glucose levels is needed to further strengthen this correlation.</p>
+</section>
+</section>
+<section id="analysis-c-comparing-x-means-with-independent-samples" class="level1">
+<h1>Analysis C: Comparing X Means with Independent Samples</h1>
+<p><em>Does frequent alcohol consumption affect baseline plasma fasting glucose level?</em></p>
+<section id="research-question-2" class="level2">
+<h2 class="anchored" data-anchor-id="research-question-2">Research question</h2>
+<p>It has been shown that alcohol consumption is a prominent risk factor for diabetes. Hence, in this analysis, I want to examine <strong>whether alcohol consumption frequency affects baseline plasma fasting glucose level?</strong></p>
+</section>
+<section id="about-the-data-2" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-data-2">About the data</h2>
+<p>In this analysis, I want to compare plasma fasting glucose levels among subjects grouped by how often they have 4/5 drinks per day in the past 12 months. As shown in the earlier sections, there are four groups, with non-drinkers serving as the control group for comparisons, and occasional, social, and heavy drinkers. The dataset has been cleaned to include only non-diabetic subjects so that fasting plasma glucose levels are not influenced by diabetes, which is known to directly enhance baseline plasma glucose levels.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>glu_summary<span class="ot">&lt;-</span>mosaic<span class="sc">::</span><span class="fu">favstats</span>(LBXGLU <span class="sc">~</span> alcohol_group, <span class="at">data =</span> glu_C)<span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">IQR =</span> Q3 <span class="sc">-</span> Q1, <span class="at">.after =</span> Q3)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(glu_summary, <span class="at">digits =</span> <span class="dv">1</span>,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption =</span> <span class="st">"Fasting plasma glucose (mg/dL) by alcohol group, non-diabetic adults"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Fasting plasma glucose (mg/dL) by alcohol group, non-diabetic adults</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 5%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">alcohol_group</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">IQR</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">missing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Nondrinker</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">95.0</td>
+<td style="text-align: right;">102</td>
+<td style="text-align: right;">110.0</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">321</td>
+<td style="text-align: right;">105.8</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">480</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Social drinker</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">94.0</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">108.0</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">408</td>
+<td style="text-align: right;">103.0</td>
+<td style="text-align: right;">20.9</td>
+<td style="text-align: right;">606</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Intermediate</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">95.0</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">109.0</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">303</td>
+<td style="text-align: right;">102.9</td>
+<td style="text-align: right;">17.4</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Heavy drinker</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">93.5</td>
+<td style="text-align: right;">99</td>
+<td style="text-align: right;">105.5</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">138</td>
+<td style="text-align: right;">99.8</td>
+<td style="text-align: right;">10.8</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>From the summary, we can see that the centers of the groups are relatively similar, with both their means and medians sitting around 100mg/dL. However, the nondrinker, social drinker, and intermediate groups all have maximum values that notably exceed those of the heavy drinker group. The IQR values are similar across all groups, indicating a similar spread. Therefore, the differences in distributions will come mostly from the tails and outliers.</p>
+<p>To assess normality of the distributions of fasting plasma glucose levels of the four groups, I have generated the following plots:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>qqC<span class="ot">&lt;-</span><span class="fu">ggplot</span>(glu_C, <span class="fu">aes</span>(<span class="at">sample =</span> LBXGLU)) <span class="sc">+</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>(<span class="at">size=</span><span class="fl">0.6</span>, <span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>() <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> alcohol_group) <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Q-Q Plots of Fasting Plasma Glucose"</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Theoretical Quantiles"</span>,</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sample Quantiles"</span>) </span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>dC<span class="ot">&lt;-</span><span class="fu">ggplot</span>(glu_C, <span class="fu">aes</span>(<span class="at">x =</span> alcohol_group, <span class="at">y =</span> LBXGLU, <span class="at">fill =</span> alcohol_group)) <span class="sc">+</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Fasting plasma glucose (mg/dL)"</span>,</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Analysis C: Fasting glucose by alcohol-consumption group"</span>) <span class="sc">+</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()<span class="sc">+</span><span class="fu">coord_flip</span>()</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>colours <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nondrinker"</span> <span class="ot">=</span> <span class="st">"grey"</span>, <span class="st">"Social drinker"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"Intermediate"</span> <span class="ot">=</span> <span class="st">"orange"</span>, <span class="st">"Heavy drinker"</span> <span class="ot">=</span> <span class="st">"red"</span>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>group_stats_C <span class="ot">&lt;-</span> glu_C <span class="sc">|&gt;</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(alcohol_group) <span class="sc">|&gt;</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_glu =</span> <span class="fu">mean</span>(LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">sd_glu   =</span> <span class="fu">sd</span>(LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>glu_range_C <span class="ot">&lt;-</span> <span class="fu">range</span>(glu_C<span class="sc">$</span>LBXGLU, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>norm_curves_C <span class="ot">&lt;-</span> group_stats_C <span class="sc">|&gt;</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reframe</span>(</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">alcohol_group =</span> alcohol_group,</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">glucose =</span> <span class="fu">seq</span>(glu_range_C[<span class="dv">1</span>], glu_range_C[<span class="dv">2</span>], <span class="at">length.out =</span> <span class="dv">200</span>),</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">density =</span> <span class="fu">dnorm</span>(glucose, <span class="at">mean =</span> mean_glu, <span class="at">sd =</span> sd_glu))</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>hC <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(glu_C, <span class="fu">aes</span>(<span class="at">x =</span> LBXGLU)) <span class="sc">+</span></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density), <span class="at">fill =</span> alcohol_group),<span class="at">binwidth =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> norm_curves_C, <span class="fu">aes</span>(<span class="at">x =</span> glucose, <span class="at">y =</span> density),<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> colours) <span class="sc">+</span></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">180</span>))<span class="sc">+</span></span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> alcohol_group) <span class="sc">+</span></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Fasting Plasma Glucose Histograms"</span>,</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Fasting Plasma Glucose (mg/dL)"</span>, <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>combinedC <span class="ot">&lt;-</span> dC <span class="sc">/</span> (qqC <span class="sc">+</span> hC) <span class="sc">+</span></span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">&amp;</span></span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">&amp;</span></span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>combinedC</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisC_data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the violin-boxplot, the nondrinker, social drinker, and intermediate drinker groups are strongly right-skewed, with the exception of the heavy drinker group. This is corroborated by the q-q plot of the three right-skewed groups, which shows a sharp upward curve at the right end. Due to this, we can only assume normality for the heavy drinker group and not the other.</p>
+</section>
+<section id="analysis-2" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-2">Analysis</h2>
+<p>Analysis of variance (ANOVA) requires normality within each group. This assumption is not satisfied, as 3 out of 4 groups for comparison are right-skewed. However, the size of each group is large enough (shown in the table below) so that this non-normality is tolerable. Therefore, an ANOVA with pre-planned Tukey HSD pairwise comparisons can be done.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>glu_C <span class="sc">|&gt;</span> <span class="fu">count</span>(alcohol_group)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  alcohol_group      n
+  &lt;fct&gt;          &lt;int&gt;
+1 Nondrinker       480
+2 Social drinker   606
+3 Intermediate     278
+4 Heavy drinker     95</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>aov_glu <span class="ot">&lt;-</span> <span class="fu">aov</span>(LBXGLU <span class="sc">~</span> alcohol_group, <span class="at">data =</span> glu_C)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(aov_glu)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Df Sum Sq Mean Sq F value Pr(&gt;F)  
+alcohol_group    3   4082  1360.7   3.413 0.0169 *
+Residuals     1455 580047   398.7                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>tukey<span class="ot">&lt;-</span><span class="fu">TukeyHSD</span>(aov_glu, <span class="at">conf.level =</span> conf_level)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>anova_tbl <span class="ot">&lt;-</span> <span class="fu">tidy</span>(aov_glu) <span class="sc">|&gt;</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">if_else</span>(term <span class="sc">==</span> <span class="st">"alcohol_group"</span>, <span class="st">"Alcohol group"</span>, term))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(anova_tbl, <span class="at">digits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>), <span class="at">align =</span> <span class="st">"lccccc"</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"One-way ANOVA: fasting plasma glucose by alcohol-consumption group"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>One-way ANOVA: fasting plasma glucose by alcohol-consumption group</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: center;">df</th>
+<th style="text-align: center;">sumsq</th>
+<th style="text-align: center;">meansq</th>
+<th style="text-align: center;">statistic</th>
+<th style="text-align: center;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Alcohol group</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4082.2</td>
+<td style="text-align: center;">1360.7</td>
+<td style="text-align: center;">3.413</td>
+<td style="text-align: center;">0.0169</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: center;">1455</td>
+<td style="text-align: center;">580047.2</td>
+<td style="text-align: center;">398.7</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>tukey_tbl <span class="ot">&lt;-</span> <span class="fu">tidy</span>(tukey) <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Comparison    =</span> contrast,</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mean diff.</span><span class="st">`</span>  <span class="ot">=</span> estimate,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lower 90% CI</span><span class="st">`</span><span class="ot">=</span> conf.low,</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Upper 90% CI</span><span class="st">`</span><span class="ot">=</span> conf.high,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Adj. p</span><span class="st">`</span>      <span class="ot">=</span> adj.p.value  )</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tukey_tbl, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">"lccc"</span>,</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Tukey HSD pairwise comparisons, fasting plasma glucose by alcohol group (90% CI)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Tukey HSD pairwise comparisons, fasting plasma glucose by alcohol group (90% CI)</caption>
+<colgroup>
+<col style="width: 38%">
+<col style="width: 15%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Comparison</th>
+<th style="text-align: center;">Mean diff.</th>
+<th style="text-align: center;">Lower 90% CI</th>
+<th style="text-align: center;">Upper 90% CI</th>
+<th style="text-align: left;">Adj. p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Social drinker-Nondrinker</td>
+<td style="text-align: center;">-2.82</td>
+<td style="text-align: center;">-5.62</td>
+<td style="text-align: center;">-0.03</td>
+<td style="text-align: left;">0.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Intermediate-Nondrinker</td>
+<td style="text-align: center;">-2.92</td>
+<td style="text-align: center;">-6.37</td>
+<td style="text-align: center;">0.53</td>
+<td style="text-align: left;">0.21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Heavy drinker-Nondrinker</td>
+<td style="text-align: center;">-6.02</td>
+<td style="text-align: center;">-11.17</td>
+<td style="text-align: center;">-0.88</td>
+<td style="text-align: left;">0.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Intermediate-Social drinker</td>
+<td style="text-align: center;">-0.09</td>
+<td style="text-align: center;">-3.41</td>
+<td style="text-align: center;">3.22</td>
+<td style="text-align: left;">1.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Heavy drinker-Social drinker</td>
+<td style="text-align: center;">-3.20</td>
+<td style="text-align: center;">-8.25</td>
+<td style="text-align: center;">1.85</td>
+<td style="text-align: left;">0.47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Heavy drinker-Intermediate</td>
+<td style="text-align: center;">-3.11</td>
+<td style="text-align: center;">-8.55</td>
+<td style="text-align: center;">2.34</td>
+<td style="text-align: left;">0.56</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(glu_C, <span class="fu">aes</span>(<span class="at">x =</span> alcohol_group,<span class="at">y=</span>LBXGLU,<span class="at">fill =</span> alcohol_group)) <span class="sc">+</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="at">alpha=</span><span class="fl">0.7</span>, <span class="at">trim=</span><span class="cn">TRUE</span>)<span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span>colours)<span class="sc">+</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width=</span><span class="fl">0.2</span>, <span class="at">fill=</span><span class="st">"black"</span>, <span class="at">outlier.alpha=</span><span class="fl">0.4</span>)<span class="sc">+</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Fasting Plasma Glucose Distribution"</span>,<span class="at">x =</span> <span class="cn">NULL</span>,<span class="at">y =</span> <span class="st">"Fasting Plasma Glucose (mg/dL)"</span>)<span class="sc">+</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisC-test-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion-1" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion-1">Conclusion</h2>
+<p>The ANOVA results indicate there is a statistically significant difference in fasting glucose across alcohol consumption groups, with a p-value of 0.017. The pairwise Tukey HSD comparison shows that the only significant difference comes from the comparison between heavy drinkers and non-drinkers, with the resulting interval not including 0 and a p-value smaller than 0.05. In the context of my research question, this result shows that alcohol consumption does affect fasting glucose levels, but only at high-frequency consumption.</p>
+<p>Interestingly, the direction of the difference is unexpected, as nondrinkers are shown to have higher fasting glucose levels than heavy drinkers. This is the opposite of what I predicted, as overt alcohol consumption is known to be a risk factor for diabetes; hence, I expected increased alcohol consumption would increase fasting glucose levels. This unexpected result can be accounted for by the fact that the non-drinker group contains a lot more outliers towards the higher end of the fasting glucose level distribution, compared to the heavy drinker group. This can also be due to other confounding factors, such as other underlying health issues or unreported diabetes, etc., that are not controlled for in the dataset.</p>
+</section>
+</section>
+<section id="analysis-d-analyzing-a-2x2-table" class="level1">
+<h1>Analysis D: Analyzing a 2x2 Table</h1>
+<p><em>Is there a sex difference in the development of diabetes in diabetic male vs female population</em></p>
+<section id="research-question-3" class="level2">
+<h2 class="anchored" data-anchor-id="research-question-3">Research question</h2>
+<p>It has been shown that diabetes is more prevalent in males than females in the US. However, it is unclear whether sex can pose as an intrinsic factor influencing disease progression or severity. The occurrence of diabetic retinopathy is used clinically to gauge overall disease severity and assess end-organ damage. Using retinopathy occurrence as a marker for severe diabetes, I want to investigate whether there is a sex difference in the development of diabetes in diabetic male vs.&nbsp;female populations by asking: ** Is severe diabetes more common in males than in females?**</p>
+</section>
+<section id="about-the-data-3" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-data-3">About the data</h2>
+<p>As mentioned in the previous section, I use the occurrence of retinopathy as an indicator of severe diabetes for this analysis. Age is a prominent factor influencing retinopathy occurrence, as it has been shown clinically to increase with aging. Hence, I want to ensure that the subject cohort used in this analysis, which is grouped by sex and retinopathy status, has similar age distributions.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>age_sum<span class="ot">&lt;-</span>mosaic<span class="sc">::</span><span class="fu">favstats</span>(RIDAGEYR <span class="sc">~</span> sex, <span class="at">data =</span> diabetics)<span class="sc">|&gt;</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">IQR =</span> Q3 <span class="sc">-</span> Q1, <span class="at">.after =</span> Q3)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(age_sum)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 11%">
+<col style="width: 4%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 6%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">sex</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">IQR</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">missing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">61.71044</td>
+<td style="text-align: right;">10.73215</td>
+<td style="text-align: right;">632</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">59.26888</td>
+<td style="text-align: right;">11.90636</td>
+<td style="text-align: right;">543</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>aD<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diabetics, <span class="fu">aes</span>(<span class="at">x=</span>sex, <span class="at">y=</span>RIDAGEYR, <span class="at">fill=</span>sex))<span class="sc">+</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Age Distribution of Male and Female Subjects"</span>, <span class="at">x =</span> <span class="st">"Sex"</span>, <span class="at">y =</span> <span class="st">"Age (years)"</span>)<span class="sc">+</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Male"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"Female"</span> <span class="ot">=</span> <span class="st">"red"</span>)) </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>retino_sum<span class="ot">&lt;-</span>mosaic<span class="sc">::</span><span class="fu">favstats</span>(RIDAGEYR <span class="sc">~</span> retinopathy, <span class="at">data =</span> diabetics)<span class="sc">|&gt;</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">IQR =</span> Q3 <span class="sc">-</span> Q1, <span class="at">.after =</span> Q3)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(retino_sum)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 10%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 5%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">retinopathy</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">Q1</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">Q3</th>
+<th style="text-align: right;">IQR</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">missing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">61.72926</td>
+<td style="text-align: right;">10.62957</td>
+<td style="text-align: right;">229</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">60.30444</td>
+<td style="text-align: right;">11.50653</td>
+<td style="text-align: right;">946</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>rD<span class="ot">&lt;-</span><span class="fu">ggplot</span>(diabetics, <span class="fu">aes</span>(<span class="at">x=</span>retinopathy, <span class="at">y=</span>RIDAGEYR, <span class="at">fill=</span>retinopathy))<span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Age Distribution of Based on Retinopathy Status"</span>,<span class="at">x =</span> <span class="st">"Retinopathy Status"</span>,<span class="at">y =</span> <span class="st">"Age (years)"</span>)<span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>, <span class="st">"No"</span> <span class="ot">=</span> <span class="st">"grey"</span>))</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>combinedD <span class="ot">&lt;-</span> (aD <span class="sc">|</span> rD) <span class="sc">&amp;</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title  =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">10</span>, <span class="dv">20</span>))   </span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>combinedD</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="study-1_files/figure-html/analysisD_data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As shown in the summaries and boxplots, the age distribution between males and females, as well as retinopathy status, is relatively similar. All sub-groups have similar center and spread, with the mean and median age around 60 years old, and an IQR of 15-16. This similar age distribution across all sub-groups controls for age as a contributing factor to retinopathy status, which strengthens the outcome of this analysis on the effect of sex on diabetes severity.</p>
+</section>
+<section id="analysis-3" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-3">Analysis</h2>
+<p>For this analysis, I will be doing relative risk, odds ratio, and risk difference comparisons. These comparisons require the values to be independent, with each value in a group representing one person counted exactly once. The data cleaning done previously satisfies this condition. These comparisons rely on normality, which is not an issue due to the large sample size of each group.</p>
+<p>Below is the work for these analysis:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'kableExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    group_rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>tab_pct <span class="ot">&lt;-</span> tab_sex <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addmargins</span>() <span class="sc">|&gt;</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame.matrix</span>()</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>col_totals <span class="ot">&lt;-</span> tab_pct[<span class="st">"Sum"</span>, ]</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>tab_display <span class="ot">&lt;-</span> tab_pct</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) {tab_display[[col]] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(tab_pct[[col]], <span class="st">" ("</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> tab_pct[[col]] <span class="sc">/</span> col_totals[[col]], <span class="dv">1</span>), <span class="st">"%)"</span>)}</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>tab_display<span class="sc">$</span>Sum <span class="ot">&lt;-</span> <span class="fu">paste0</span>(tab_pct<span class="sc">$</span>Sum, <span class="st">" ("</span>,</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> tab_pct<span class="sc">$</span>Sum <span class="sc">/</span> col_totals<span class="sc">$</span>Sum, <span class="dv">1</span>), <span class="st">"%)"</span>)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>tab_display <span class="ot">&lt;-</span> tab_display <span class="sc">|&gt;</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">rownames_to_column</span>(<span class="st">"Retinopathy"</span>)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab_display, <span class="at">align =</span> <span class="st">"lccc"</span>,</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Retinopathy by sex among diabetics, count (column %)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="fu">nrow</span>(tab_display), <span class="at">bold =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">4</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<caption>Retinopathy by sex among diabetics, count (column %)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Retinopathy</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Male</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Female</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: center;">115 (18.2%)</td>
+<td style="text-align: center;">114 (21%)</td>
+<td style="text-align: center; font-weight: bold;">229 (19.5%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No</td>
+<td style="text-align: center;">517 (81.8%)</td>
+<td style="text-align: center;">429 (79%)</td>
+<td style="text-align: center; font-weight: bold;">946 (80.5%)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold;">Sum</td>
+<td style="text-align: center; font-weight: bold;">632 (100%)</td>
+<td style="text-align: center; font-weight: bold;">543 (100%)</td>
+<td style="text-align: center; font-weight: bold; font-weight: bold;">1175 (100%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>tab_sex <span class="ot">&lt;-</span> <span class="fu">table</span>(diabetics<span class="sc">$</span>retinopathy, diabetics<span class="sc">$</span>sex)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>tab_sex</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     
+      Male Female
+  Yes  115    114
+  No   517    429</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>twoby2 <span class="ot">&lt;-</span> <span class="cf">function</span>(tab) {</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> tab[<span class="st">"Yes"</span>, <span class="st">"Male"</span>];   b <span class="ot">&lt;-</span> tab[<span class="st">"No"</span>, <span class="st">"Male"</span>]</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  c <span class="ot">&lt;-</span> tab[<span class="st">"Yes"</span>, <span class="st">"Female"</span>]; d <span class="ot">&lt;-</span> tab[<span class="st">"No"</span>, <span class="st">"Female"</span>]</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  risk_m <span class="ot">&lt;-</span> a <span class="sc">/</span> (a <span class="sc">+</span> b); risk_f <span class="ot">&lt;-</span> c <span class="sc">/</span> (c <span class="sc">+</span> d)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  rr <span class="ot">&lt;-</span> risk_m <span class="sc">/</span> risk_f; or_ <span class="ot">&lt;-</span> (a <span class="sc">*</span> d) <span class="sc">/</span> (b <span class="sc">*</span> c); rd <span class="ot">&lt;-</span> risk_m <span class="sc">-</span> risk_f</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> alpha <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  se_logrr <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">/</span>a <span class="sc">-</span> <span class="dv">1</span><span class="sc">/</span>(a<span class="sc">+</span>b) <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>c <span class="sc">-</span> <span class="dv">1</span><span class="sc">/</span>(c<span class="sc">+</span>d))</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  se_logor  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">/</span>a <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>b <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>c <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>d)</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  se_rd     <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(risk_m<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>risk_m)<span class="sc">/</span>(a<span class="sc">+</span>b) <span class="sc">+</span> risk_f<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>risk_f)<span class="sc">/</span>(c<span class="sc">+</span>d))</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">risk_male =</span> risk_m, <span class="at">risk_female =</span> risk_f,</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">RR =</span> rr, <span class="at">RR_CI =</span> <span class="fu">exp</span>(<span class="fu">log</span>(rr) <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> z <span class="sc">*</span> se_logrr),</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">OR =</span> or_, <span class="at">OR_CI =</span> <span class="fu">exp</span>(<span class="fu">log</span>(or_) <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> z <span class="sc">*</span> se_logor),</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">RD =</span> rd, <span class="at">RD_CI =</span> rd <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> z <span class="sc">*</span> se_rd</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">twoby2</span>(tab_sex)</span>
+<span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-20"><a href="#cb51-20" aria-hidden="true" tabindex="-1"></a>summary_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb51-21"><a href="#cb51-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">Measure    =</span> <span class="fu">c</span>(<span class="st">"Relative Risk (Male/Female)"</span>, <span class="st">"Odds Ratio (Male/Female)"</span>,</span>
+<span id="cb51-22"><a href="#cb51-22" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Risk Difference (Male-Female)"</span>),</span>
+<span id="cb51-23"><a href="#cb51-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estimate   =</span> <span class="fu">c</span>(res<span class="sc">$</span>RR, res<span class="sc">$</span>OR, res<span class="sc">$</span>RD),</span>
+<span id="cb51-24"><a href="#cb51-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Lower 90% CI</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(res<span class="sc">$</span>RR_CI[<span class="dv">1</span>], res<span class="sc">$</span>OR_CI[<span class="dv">1</span>], res<span class="sc">$</span>RD_CI[<span class="dv">1</span>]),</span>
+<span id="cb51-25"><a href="#cb51-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Upper 90% CI</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(res<span class="sc">$</span>RR_CI[<span class="dv">2</span>], res<span class="sc">$</span>OR_CI[<span class="dv">2</span>], res<span class="sc">$</span>RD_CI[<span class="dv">2</span>])</span>
+<span id="cb51-26"><a href="#cb51-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb51-27"><a href="#cb51-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-28"><a href="#cb51-28" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(summary_tbl, <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb51-29"><a href="#cb51-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Retinopathy in male vs. female diabetics: RR, OR, and risk difference (90% CI)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Retinopathy in male vs.&nbsp;female diabetics: RR, OR, and risk difference (90% CI)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Measure</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Lower 90% CI</th>
+<th style="text-align: right;">Upper 90% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Relative Risk (Male/Female)</td>
+<td style="text-align: right;">0.867</td>
+<td style="text-align: right;">0.713</td>
+<td style="text-align: right;">1.053</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Odds Ratio (Male/Female)</td>
+<td style="text-align: right;">0.837</td>
+<td style="text-align: right;">0.657</td>
+<td style="text-align: right;">1.067</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Risk Difference (Male-Female)</td>
+<td style="text-align: right;">-0.028</td>
+<td style="text-align: right;">-0.066</td>
+<td style="text-align: right;">0.010</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="conclusion-2" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion-2">Conclusion</h2>
+<p>The 90% confidence intervals for relative risk, odds ratio, and risk differences all contain 0, hence, there is no statistically significant sex difference in severe diabetes risk among diabetics at this confidence level.</p>
+<p>A drawback of this analysis is that the dataset disregards other underlying confounding factors that contribute to the development of severe diabetes, such as other underlying health issues, food access, healthcare access, etc. In addition, even though retinopathy is a common clinical characteristic of worsening diabetes, it is not the defining feature of severe diabetes. Therefore, we cannot rule out sex to be an intrinsic factor that contributes to the difference in the severity of diabetes between males and females.</p>
+</section>
+</section>
+<section id="session-info" class="level1">
+<h1>Session Info</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.6.1 (2026-06-24 ucrt)
+ os       Windows 11 x64 (build 26200)
+ system   x86_64, mingw32
+ ui       RTerm
+ language (EN)
+ collate  English_United States.utf8
+ ctype    English_United States.utf8
+ tz       America/New_York
+ date     2026-09-28
+ pandoc   3.10 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
+ quarto   1.10.18 @ C:\\PROGRA~1\\RStudio\\resources\\app\\bin\\quarto\\bin\\quarto.exe
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ package           * version date (UTC) lib source
+ backports           1.5.1   2026-04-03 [1] CRAN (R 4.6.1)
+ broom             * 1.0.13  2026-05-14 [1] CRAN (R 4.6.1)
+ cli                 3.6.6   2026-04-09 [1] CRAN (R 4.6.1)
+ digest              0.6.39  2025-11-19 [1] CRAN (R 4.6.1)
+ dplyr             * 1.2.1   2026-04-03 [1] CRAN (R 4.6.1)
+ evaluate            1.0.5   2025-08-27 [1] CRAN (R 4.6.1)
+ farver              2.1.2   2024-05-13 [1] CRAN (R 4.6.1)
+ fastmap             1.2.0   2024-05-15 [1] CRAN (R 4.6.1)
+ fontBitstreamVera   0.1.1   2017-02-01 [1] CRAN (R 4.6.1)
+ fontLiberation      0.1.0   2016-10-15 [1] CRAN (R 4.6.1)
+ fontquiver          0.2.1   2017-02-01 [1] CRAN (R 4.6.1)
+ forcats           * 1.0.1   2025-09-25 [1] CRAN (R 4.6.1)
+ foreign             0.8-91  2026-01-29 [2] CRAN (R 4.6.1)
+ gdtools             0.5.1   2026-05-25 [1] CRAN (R 4.6.1)
+ generics            0.1.4   2025-05-09 [1] CRAN (R 4.6.1)
+ ggformula         * 1.0.1   2026-01-17 [1] CRAN (R 4.6.1)
+ ggiraph             0.9.6   2026-02-21 [1] CRAN (R 4.6.1)
+ ggplot2           * 4.0.3   2026-04-22 [1] CRAN (R 4.6.1)
+ ggridges            0.5.7   2025-08-27 [1] CRAN (R 4.6.1)
+ glue                1.8.1   2026-04-17 [1] CRAN (R 4.6.1)
+ gtable              0.3.6   2024-10-25 [1] CRAN (R 4.6.1)
+ haven               2.5.5   2025-05-30 [1] CRAN (R 4.6.1)
+ hms                 1.1.4   2025-10-17 [1] CRAN (R 4.6.1)
+ htmltools           0.5.9   2025-12-04 [1] CRAN (R 4.6.1)
+ htmlwidgets         1.6.4   2023-12-06 [1] CRAN (R 4.6.1)
+ httr                1.4.8   2026-02-13 [1] CRAN (R 4.6.1)
+ jsonlite            2.0.0   2025-03-27 [1] CRAN (R 4.6.1)
+ kableExtra        * 1.4.1   2026-07-08 [1] CRAN (R 4.6.1)
+ knitr             * 1.51    2025-12-20 [1] CRAN (R 4.6.1)
+ labeling            0.4.3   2023-08-29 [1] CRAN (R 4.6.1)
+ labelled            2.16.1  2026-08-20 [1] CRAN (R 4.6.1)
+ lattice           * 0.23-1  2026-08-12 [1] CRAN (R 4.6.1)
+ lifecycle           1.0.5   2026-01-08 [1] CRAN (R 4.6.1)
+ lubridate         * 1.9.5   2026-02-04 [1] CRAN (R 4.6.1)
+ magrittr            2.0.5   2026-04-04 [1] CRAN (R 4.6.1)
+ MASS                7.3-66  2026-07-15 [1] CRAN (R 4.6.1)
+ Matrix            * 1.7-6   2026-07-25 [1] CRAN (R 4.6.1)
+ mosaic              1.10.2  2026-05-13 [1] CRAN (R 4.6.1)
+ mosaicCore          0.9.5   2025-07-30 [1] CRAN (R 4.6.1)
+ mosaicData        * 0.20.4  2023-11-05 [1] CRAN (R 4.6.1)
+ naniar            * 1.1.0   2024-03-05 [1] CRAN (R 4.6.1)
+ nhanesA           * 1.4.1   2025-10-14 [1] CRAN (R 4.6.1)
+ otel                0.2.0   2025-08-29 [1] CRAN (R 4.6.1)
+ patchwork         * 1.3.2   2025-08-25 [1] CRAN (R 4.6.1)
+ pillar              1.11.1  2025-09-17 [1] CRAN (R 4.6.1)
+ pkgconfig           2.0.3   2019-09-22 [1] CRAN (R 4.6.1)
+ plyr                1.8.9   2023-10-02 [1] CRAN (R 4.6.1)
+ purrr             * 1.2.2   2026-04-10 [1] CRAN (R 4.6.1)
+ R6                  2.6.1   2025-02-15 [1] CRAN (R 4.6.1)
+ RColorBrewer        1.1-3   2022-04-03 [1] CRAN (R 4.6.1)
+ Rcpp                1.1.2   2026-07-05 [1] CRAN (R 4.6.1)
+ readr             * 2.2.0   2026-02-19 [1] CRAN (R 4.6.1)
+ rlang               1.3.0   2026-07-05 [1] CRAN (R 4.6.1)
+ rmarkdown           2.31    2026-03-26 [1] CRAN (R 4.6.1)
+ rstudioapi          0.19.0  2026-06-11 [1] CRAN (R 4.6.1)
+ rvest               1.0.5   2025-08-29 [1] CRAN (R 4.6.1)
+ S7                  0.2.2   2026-04-22 [1] CRAN (R 4.6.1)
+ scales              1.4.0   2025-04-24 [1] CRAN (R 4.6.1)
+ sessioninfo         1.2.4   2026-06-04 [1] CRAN (R 4.6.1)
+ stringi             1.8.9   2026-08-04 [1] CRAN (R 4.6.1)
+ stringr           * 1.6.0   2025-11-04 [1] CRAN (R 4.6.1)
+ svglite             2.2.2   2025-10-21 [1] CRAN (R 4.6.1)
+ systemfonts         1.3.2   2026-03-05 [1] CRAN (R 4.6.1)
+ textshaping         1.0.5   2026-03-06 [1] CRAN (R 4.6.1)
+ tibble            * 3.3.1   2026-01-11 [1] CRAN (R 4.6.1)
+ tidyr             * 1.3.2   2025-12-19 [1] CRAN (R 4.6.1)
+ tidyselect          1.2.1   2024-03-11 [1] CRAN (R 4.6.1)
+ tidyverse         * 2.0.0   2023-02-22 [1] CRAN (R 4.6.1)
+ timechange          0.4.0   2026-01-29 [1] CRAN (R 4.6.1)
+ tzdb                0.5.0   2025-03-15 [1] CRAN (R 4.6.1)
+ utf8                1.2.6   2025-06-08 [1] CRAN (R 4.6.1)
+ vctrs               0.7.3   2026-04-11 [1] CRAN (R 4.6.1)
+ viridisLite         0.4.3   2026-02-04 [1] CRAN (R 4.6.1)
+ visdat              0.6.0   2023-02-02 [1] CRAN (R 4.6.1)
+ withr               3.0.3   2026-06-19 [1] CRAN (R 4.6.1)
+ xfun                0.60    2026-07-09 [1] CRAN (R 4.6.1)
+ xml2                1.6.0   2026-06-22 [1] CRAN (R 4.6.1)
+ yaml                2.3.12  2025-12-10 [1] CRAN (R 4.6.1)
+
+ [1] C:/Users/khoit/AppData/Local/R/win-library/4.6
+ [2] C:/Program Files/R/R-4.6.1/library
+ * ── Packages attached to the search path.
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
