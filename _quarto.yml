@@ -16,8 +16,8 @@ website:
     left:
       - text: "Projects"
         href: projects/index.qmd
-      - text: "Blog"
-        href: photography/index.qmd
+      - text: "Dashboard"
+        href: Dashboard/study 1.qmd
       - text: "CV"
         href: cv/index.qmd
     
