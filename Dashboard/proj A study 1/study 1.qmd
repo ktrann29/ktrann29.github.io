@@ -1,6 +1,7 @@
 ---
-title: "study 1"
+title: "Study 1"
 author: "khoi tran"
+date: last-modified
 format: html
 editor: visual
 ---
@@ -30,17 +31,17 @@ diq<-nhanes("P_DIQ", translated = FALSE)|>tibble()
 alq<-nhanes("P_ALQ", translated = FALSE)|>tibble()
 
 #Saving the RDS
-saveRDS(demo, "C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DEMO.Rds") 
-saveRDS(glu, "C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_GLU.Rds")
-saveRDS(diq,"C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DIQ.Rds")
-saveRDS(alq, "C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_ALQ.Rds")
+saveRDS(demo, "data/P_DEMO.Rds") 
+saveRDS(glu, "data/P_GLU.Rds")
+saveRDS(diq,"data/P_DIQ.Rds")
+saveRDS(alq, "data/P_ALQ.Rds")
 
 
 #reading data as tibble
-demo<-readRDS("C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DEMO.Rds") 
-glu<-readRDS("C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_GLU.Rds")
-diq<-readRDS("C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_DIQ.Rds")
-alq<-readRDS("C:/Users/khoit/OneDrive/Desktop/PQHS projA/proj A study 1/P_ALQ.Rds")
+demo<-readRDS("data/P_DEMO.Rds") 
+glu<-readRDS("data/P_GLU.Rds")
+diq<-readRDS("data/P_DIQ.Rds")
+alq<-readRDS("data/P_ALQ.Rds")
 ```
 
 # Data Cleaning
@@ -80,7 +81,7 @@ nrow(diqA)
 
 ## Analysis B
 
-In this analysis, I want to compare the fasting glucose levels of non-diabetic subjects in males vs. females. To do this, I filtered out non-diabetic subjects from the DIQ010 dataset and selected only subjects with available fasting glucose levels from the LBXGLU dataset. Then, I divided this cohort into subgroups by sex. 
+In this analysis, I want to compare the fasting glucose levels of non-diabetic subjects in males vs. females. To do this, I filtered out non-diabetic subjects from the DIQ010 dataset and selected only subjects with available fasting glucose levels from the LBXGLU dataset. Then, I divided this cohort into subgroups by sex.
 
 ```{r analysisB_clean, message = FALSE, warning = FALSE}
 diqB <- all_clean |>
@@ -101,7 +102,7 @@ n_distinct(diqB$LBXGLU)
 
 ## Analysis C
 
-In this analysis, I want to compare baseline fasting glucose levels between groups with varying alcohol consumption levels. The ALQ142 dataset classifies subjects into different groups based on how many days they have had 4 or 5 drinks in the past 12 months. I merged these groups together to create 4 broader sub-groups that signify the subjects' drinking habits. The groups include: social drinker, intermediate, and heavy drinker, with social drinker having the fewest days with 4 or 5 drinks and heavy drinker having the most. For the "non-drinker" control group, I used subjects that responded "Never" in the ALQ121 dataset, which asks how often they drank alcoholic beverages in the past 12 months. 
+In this analysis, I want to compare baseline fasting glucose levels between groups with varying alcohol consumption levels. The ALQ142 dataset classifies subjects into different groups based on how many days they have had 4 or 5 drinks in the past 12 months. I merged these groups together to create 4 broader sub-groups that signify the subjects' drinking habits. The groups include: social drinker, intermediate, and heavy drinker, with social drinker having the fewest days with 4 or 5 drinks and heavy drinker having the most. For the "non-drinker" control group, I used subjects that responded "Never" in the ALQ121 dataset, which asks how often they drank alcoholic beverages in the past 12 months.
 
 Below is the code where I filtered for only non-diabetic subjects and set the criteria for my four subgroups.
 
@@ -227,7 +228,6 @@ As shown in the data exploration part, the distribution of reported LDL values i
 
 In addition, even though we cannot assume normality, the sample sizes for both populations are larger than 30. The paired t-test cannot compare medians, so the bootstrap method is more appropriate. I created the variable diqA_diff to generate the difference between the reported and recommended LDL values, then used the bootstrap method to compare the median difference.
 
-
 ```{r analysisA_test}
 diqA_diff <- diqA |> mutate(diff = reported_ldl - goal_ldl)
 set.seed(431)
@@ -251,9 +251,6 @@ bA
 ## Conclusion
 
 From the resulting table, the interval includes 0. Therefore, at 90% confidence level, there is no difference in the median between reported and recommended LDL. In the context of the central question, this means that the diabetic pill does have a positive effect in helping diabetic patients manage LDL levels, which is one of the main clinical outcomes in diabetes.
-
-
-
 
 # Analysis B: Comparing 2 Means with Independent Samples
 
@@ -347,9 +344,6 @@ ggplot(diqB, aes(x = sex, y = LBXGLU, fill = sex)) +
 The results indicate that men do have a higher mean baseline fasting glucose level compared to women (105.1 vs 102.4 mg/dL). The resulting interval from the t-test does not include 0. Therefore, at 90% confidence level, there is a statistically significant difference in the mean baseline fasting glucose level between non-diabetic men and women. This is interesting because it suggests that the difference in baseline fasting glucose levels might act as an intrinsic factor contributing to diabetes being more prevalent in the male population compared to the female population.
 
 However, this analysis only loosely supports this hypothesis, as the glucose levels on the higher end of the distribution might be due to undiagnosed diabetes in both groups. A controlled experiment using age-matched subjects with similar fasting glucose levels is needed to further strengthen this correlation.
-
-
-
 
 # Analysis C: Comparing X Means with Independent Samples
 
@@ -464,12 +458,9 @@ ggplot(glu_C, aes(x = alcohol_group,y=LBXGLU,fill = alcohol_group)) +
 
 ## Conclusion
 
-The ANOVA results indicate there is a statistically significant difference in fasting glucose across alcohol consumption groups, with a p-value of 0.017. The pairwise Tukey HSD comparison shows that the only significant difference comes from the comparison between heavy drinkers and non-drinkers, with the resulting interval not including 0 and a p-value smaller than 0.05. In the context of my research question, this result shows that alcohol consumption does affect fasting glucose levels, but only at high-frequency consumption. 
+The ANOVA results indicate there is a statistically significant difference in fasting glucose across alcohol consumption groups, with a p-value of 0.017. The pairwise Tukey HSD comparison shows that the only significant difference comes from the comparison between heavy drinkers and non-drinkers, with the resulting interval not including 0 and a p-value smaller than 0.05. In the context of my research question, this result shows that alcohol consumption does affect fasting glucose levels, but only at high-frequency consumption.
 
-Interestingly, the direction of the difference is unexpected, as nondrinkers are shown to have higher fasting glucose levels than heavy drinkers. This is the opposite of what I predicted, as overt alcohol consumption is known to be a risk factor for diabetes; hence, I expected increased alcohol consumption would increase fasting glucose levels. This unexpected result can be accounted for by the fact that the non-drinker group contains a lot more outliers towards the higher end of the fasting glucose level distribution, compared to the heavy drinker group. This can also be due to other confounding factors, such as other underlying health issues or unreported diabetes, etc., that are not controlled for in the dataset. 
-
-
-
+Interestingly, the direction of the difference is unexpected, as nondrinkers are shown to have higher fasting glucose levels than heavy drinkers. This is the opposite of what I predicted, as overt alcohol consumption is known to be a risk factor for diabetes; hence, I expected increased alcohol consumption would increase fasting glucose levels. This unexpected result can be accounted for by the fact that the non-drinker group contains a lot more outliers towards the higher end of the fasting glucose level distribution, compared to the heavy drinker group. This can also be due to other confounding factors, such as other underlying health issues or unreported diabetes, etc., that are not controlled for in the dataset.
 
 # Analysis D: Analyzing a 2x2 Table
 
@@ -477,7 +468,7 @@ Interestingly, the direction of the difference is unexpected, as nondrinkers are
 
 ## Research question
 
-It has been shown that diabetes is more prevalent in males than females in the US. However, it is unclear whether sex can pose as an intrinsic factor influencing disease progression or severity. The occurrence of diabetic retinopathy is used clinically to gauge overall disease severity and assess end-organ damage. Using retinopathy occurrence as a marker for severe diabetes, I want to investigate whether there is a sex difference in the development of diabetes in diabetic male vs. female populations by asking: ** Is severe diabetes more common in males than in females?**
+It has been shown that diabetes is more prevalent in males than females in the US. However, it is unclear whether sex can pose as an intrinsic factor influencing disease progression or severity. The occurrence of diabetic retinopathy is used clinically to gauge overall disease severity and assess end-organ damage. Using retinopathy occurrence as a marker for severe diabetes, I want to investigate whether there is a sex difference in the development of diabetes in diabetic male vs. female populations by asking: \*\* Is severe diabetes more common in males than in females?\*\*
 
 ## About the data
 
@@ -571,10 +562,9 @@ kable(summary_tbl, digits = 3,
 
 ## Conclusion
 
-The 90% confidence intervals for relative risk, odds ratio, and risk differences all contain 0, hence, there is no statistically significant sex difference in severe diabetes risk among diabetics at this confidence level. 
+The 90% confidence intervals for relative risk, odds ratio, and risk differences all contain 0, hence, there is no statistically significant sex difference in severe diabetes risk among diabetics at this confidence level.
 
 A drawback of this analysis is that the dataset disregards other underlying confounding factors that contribute to the development of severe diabetes, such as other underlying health issues, food access, healthcare access, etc. In addition, even though retinopathy is a common clinical characteristic of worsening diabetes, it is not the defining feature of severe diabetes. Therefore, we cannot rule out sex to be an intrinsic factor that contributes to the difference in the severity of diabetes between males and females.
-
 
 # Session Info
 
