@@ -291,7 +291,7 @@ codebook <- tribble(
 
 # Overview
 
-## Row {height=35%}
+## Row {height=45%}
 
 ```{r}
 #| content: valuebox
@@ -323,7 +323,7 @@ list(icon = "cup-straw", color = "white", value = fmt(c_p, 3))
 list(icon = "eye-fill", color = "white", value = fmt(d_res$RR, 2))
 ```
 
-## Row {height=65%}
+## Row {height=60%}
 
 ### Column {width=60%}
 

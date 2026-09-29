@@ -1,6 +1,8 @@
 ---
-title: Publications
+title: Projects
 ---
+
+# Publications
 
 <a href="https://doi.org/10.1073/pnas.2514355123" target="_blank"> Ubiquitin-specific peptidase-19 links TDP-43 aggregation to ER stress</a> <br>
 
