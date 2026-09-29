@@ -144,7 +144,7 @@ tab_sex
 # Codebook
 
 | Variable | Description |
-|-----------------------------------:|:-----------------------------------|
+|---:|:---|
 | `diabetics` | subjects with reported diabetes |
 | `sex` | female or male |
 | `nondrinker` | have not had alcohol in the past 12 months |

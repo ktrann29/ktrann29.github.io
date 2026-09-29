@@ -1,8 +1,6 @@
 ---
-title: Projects
+title: Publications
 ---
-
-## Publications
 
 <a href="https://doi.org/10.1073/pnas.2514355123" target="_blank"> Ubiquitin-specific peptidase-19 links TDP-43 aggregation to ER stress</a> <br>
 
@@ -11,9 +9,3 @@ Y. Yan, X. Wang, H. Jeon, T.R. Kee, **K.D. Tran**, H. Lee, X. Zhao, T. Liu, S.S.
 ----
 
 
-
-```{=html}
-<div  style="margin: 15px; text-align: center;">
-<a class="btn btn-primary" href="https://www.marvinschmitt.com/blog/website-tutorial-quarto/" role="button" target="_blank" style="padding: 15px 30px;">View the tutorial for this template (+ download link)</a>
-</div>
-```

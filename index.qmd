@@ -32,9 +32,4 @@ Case Western Reserve University | Cleveland, OH
 Case Western Reserve University | Cleveland, OH
 <br>B.A in Biochemistry | Aug. 2021 - May 2025
 
-```{=html}
-<div  style="margin: 30px; text-align: center;">
-<a class="btn btn-primary" href="https://www.marvinschmitt.com/blog/website-tutorial-quarto/" role="button" target="_blank" style="padding: 15px 30px;">View the tutorial for this template (+ download link)</a>
-</div>
-```
 
