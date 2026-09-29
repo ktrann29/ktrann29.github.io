@@ -1,0 +1,889 @@
+---
+title: "Study 1"
+author: "Khoi Tran"
+date-modified: last-modified
+format:
+  dashboard:
+    theme: [pulse, html/styles.scss]
+    orientation: rows
+    include-in-header:
+      text: |
+        <style>
+          /* Smaller text in every text card (value boxes keep their size) */
+          .card:not(.bslib-value-box) .card-body p,
+          .card:not(.bslib-value-box) .card-body li {
+            font-size: 0.82rem;
+            line-height: 1.35;
+          }
+          /* Bold subheaders: card titles and tab labels */
+          .card-header,
+          .card-header .card-title,
+          .nav-tabs .nav-link {
+            font-weight: 700;
+          }
+        </style>
+    nav-buttons:
+      - icon: github
+        href: https://github.com/YOUR-USERNAME/YOUR-REPO
+        aria-label: GitHub repository for this dashboard
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(here)
+library(broom)
+library(gt)
+library(patchwork)
+library(tidyverse)
+
+conf_level <- 0.90
+alpha      <- 1 - conf_level
+ci_txt     <- paste0(round(100 * conf_level), "% CI")
+
+theme_set(theme_light())
+
+# ---- Helpers ---------------------------------------------------------------
+fmt <- function(x, digits = 1) formatC(x, format = "f", digits = digits, big.mark = ",")
+
+fmt_ci <- function(est, lo, hi, digits = 1) {
+  paste0(fmt(est, digits), " (", ci_txt, " ", fmt(lo, digits), " to ", fmt(hi, digits), ")")
+}
+
+fmt_p <- function(p) if (p < 0.001) "p < 0.001" else paste0("p = ", formatC(p, format = "f", digits = 3))
+
+# Does the interval sit above, below, or around the null value?
+ci_position <- function(lo, hi, null = 0) {
+  if (lo > null) "lies entirely above" else if (hi < null) "lies entirely below" else "includes"
+}
+excludes_null <- function(lo, hi, null = 0) !(lo <= null & hi >= null)
+
+# gt table for mosaic::favstats() output
+gt_fav <- function(df, ...) {
+  df |>
+    as_tibble() |>
+    gt(...) |>
+    fmt_number(columns = any_of(c("min", "Q1", "median", "Q3", "IQR", "max", "mean", "sd")),
+               decimals = 1) |>
+    fmt_number(columns = any_of(c("n", "missing")), decimals = 0)
+}
+
+# Shared palettes
+pal_sex     <- c("Male" = "steelblue", "Female" = "red")
+pal_retino  <- c("Yes" = "steelblue", "No" = "grey70")
+pal_alcohol <- c("Nondrinker" = "grey", "Social drinker" = "steelblue",
+                 "Intermediate" = "orange", "Heavy drinker" = "red")
+
+# ---- Data import: download once, then read from data/ ----------------------
+nh_files <- c("P_DEMO", "P_GLU", "P_DIQ", "P_ALQ")
+dir.create(here("data"), showWarnings = FALSE)
+for (f in nh_files) {
+  path <- here("data", paste0(f, ".Rds"))
+  if (!file.exists(path)) {
+    saveRDS(as_tibble(nhanesA::nhanes(f, translated = FALSE)), path)
+  }
+}
+demo <- readRDS(here("data", "P_DEMO.Rds"))
+glu  <- readRDS(here("data", "P_GLU.Rds"))
+diq  <- readRDS(here("data", "P_DIQ.Rds"))
+alq  <- readRDS(here("data", "P_ALQ.Rds"))
+
+# ---- Data cleaning ---------------------------------------------------------
+all_raw <- demo |>
+  left_join(diq, by = "SEQN") |>
+  left_join(glu, by = "SEQN") |>
+  left_join(alq, by = "SEQN")
+
+# Interviewed + examined adults, age 21-79
+all_clean <- all_raw |>
+  filter(RIDSTATR == 2, RIDAGEYR >= 21, RIDAGEYR <= 79)
+
+# Analysis A: diabetics taking pills, with reported and recommended LDL
+diqA <- all_clean |>
+  filter(DIQ070 == 1) |>
+  mutate(
+    reported_ldl = DID320 |> na_if(5555) |> na_if(6666) |> na_if(7777) |> na_if(9999),
+    goal_ldl     = DID330 |> na_if(6666) |> na_if(7777) |> na_if(9999)
+  ) |>
+  filter(!is.na(reported_ldl), !is.na(goal_ldl))
+
+# Analysis B: non-diabetics with fasting glucose, by sex
+diqB <- all_clean |>
+  filter(DIQ010 == 2, RIAGENDR %in% c(1, 2), !is.na(LBXGLU)) |>
+  mutate(sex = factor(RIAGENDR, levels = c(1, 2), labels = c("Male", "Female")))
+
+# Analysis C: non-diabetics grouped by alcohol use
+diqC <- all_clean |>
+  filter(DIQ010 == 2) |>
+  mutate(
+    alcohol_group = case_when(
+      ALQ121 == 0       ~ "Nondrinker",
+      ALQ142 %in% 7:10  ~ "Social drinker",
+      ALQ142 %in% 4:6   ~ "Intermediate",
+      ALQ142 %in% 1:3   ~ "Heavy drinker",
+      TRUE              ~ NA_character_
+    ),
+    alcohol_group = factor(alcohol_group,
+                           levels = c("Nondrinker", "Social drinker", "Intermediate", "Heavy drinker"))
+  ) |>
+  filter(!is.na(alcohol_group))
+glu_C <- diqC |> filter(!is.na(LBXGLU))
+
+# Analysis D: diabetics with known retinopathy status
+diabetics <- all_clean |>
+  filter(DIQ010 == 1, DIQ080 %in% c(1, 2)) |>
+  mutate(
+    sex         = factor(RIAGENDR, levels = c(1, 2), labels = c("Male", "Female")),
+    retinopathy = factor(DIQ080,   levels = c(1, 2), labels = c("Yes", "No"))
+  )
+
+# ---- Analysis A: bootstrap of the median paired difference -----------------
+a_age_med <- median(diqA$RIDAGEYR)
+diqA_diff <- diqA |> mutate(diff = reported_ldl - goal_ldl)
+set.seed(431)
+boot_med <- replicate(10000, median(sample(diqA_diff$diff, replace = TRUE)))
+a_est <- tibble(
+  estimate  = median(diqA_diff$diff),
+  conf.low  = quantile(boot_med, alpha / 2, names = FALSE),
+  conf.high = quantile(boot_med, 1 - alpha / 2, names = FALSE)
+)
+a_sig <- excludes_null(a_est$conf.low, a_est$conf.high)
+
+# ---- Analysis B: Welch two-sample t-test (Male minus Female) ---------------
+b_test <- t.test(LBXGLU ~ sex, data = diqB, conf.level = conf_level)
+b_tidy <- tidy(b_test)
+b_sig  <- excludes_null(b_tidy$conf.low, b_tidy$conf.high)
+b_dir  <- if (b_tidy$estimate > 0) "higher" else "lower"
+b_note <- if (b_sig && b_tidy$estimate > 0) {
+  paste("This is interesting because it suggests that baseline fasting glucose might be an intrinsic",
+        "factor contributing to diabetes being more prevalent in men. The analysis only loosely supports",
+        "this idea: the high end of the glucose distribution in both groups may reflect undiagnosed diabetes.",
+        "A controlled study with age-matched subjects and similar fasting glucose levels is needed to",
+        "strengthen the link.")
+} else {
+  ""
+}
+
+# ---- Analysis C: one-way ANOVA + Tukey HSD ---------------------------------
+c_aov       <- aov(LBXGLU ~ alcohol_group, data = glu_C)
+c_anova     <- tidy(c_aov)
+c_tukey     <- tidy(TukeyHSD(c_aov, conf.level = conf_level))
+c_p         <- c_anova$p.value[1]
+c_sig_pairs <- c_tukey |> filter(conf.low > 0 | conf.high < 0)
+c_pairs_txt <- if (nrow(c_sig_pairs)) paste(c_sig_pairs$contrast, collapse = "; ") else "none"
+c_counts    <- glu_C |> count(alcohol_group)
+c_counts_txt <- paste0(c_counts$alcohol_group, " (", fmt(c_counts$n, 0), ")", collapse = ", ")
+c_hn        <- c_tukey |> filter(contrast == "Heavy drinker-Nondrinker")
+c_unexpected <- nrow(c_hn) == 1 && c_hn$conf.high < 0
+c_note <- if (c_unexpected) {
+  paste("Interestingly, the direction is unexpected: nondrinkers have higher fasting glucose than heavy",
+        "drinkers, the opposite of what I predicted, since heavy alcohol use is a known risk factor for",
+        "diabetes. The nondrinker group has many more high-end outliers than the heavy-drinker group, and",
+        "other confounders that are not controlled for (other health issues, unreported diabetes, etc.)",
+        "may also play a role.")
+} else {
+  ""
+}
+
+# ---- Analysis D: 2 x 2 table, RR / OR / RD (Male vs. Female) ---------------
+d_table <- table(diabetics$retinopathy, diabetics$sex)
+
+twoby2 <- function(tab, conf = conf_level) {
+  yes_m <- tab["Yes", "Male"];   no_m <- tab["No", "Male"]
+  yes_f <- tab["Yes", "Female"]; no_f <- tab["No", "Female"]
+  risk_m <- yes_m / (yes_m + no_m)
+  risk_f <- yes_f / (yes_f + no_f)
+  rr  <- risk_m / risk_f
+  or_ <- (yes_m * no_f) / (no_m * yes_f)
+  rd  <- risk_m - risk_f
+  z   <- qnorm(1 - (1 - conf) / 2)
+  se_logrr <- sqrt(1 / yes_m - 1 / (yes_m + no_m) + 1 / yes_f - 1 / (yes_f + no_f))
+  se_logor <- sqrt(1 / yes_m + 1 / no_m + 1 / yes_f + 1 / no_f)
+  se_rd    <- sqrt(risk_m * (1 - risk_m) / (yes_m + no_m) + risk_f * (1 - risk_f) / (yes_f + no_f))
+  list(
+    risk_male = risk_m, risk_female = risk_f,
+    RR = rr,  RR_CI = exp(log(rr)  + c(-1, 1) * z * se_logrr),
+    OR = or_, OR_CI = exp(log(or_) + c(-1, 1) * z * se_logor),
+    RD = rd,  RD_CI = rd + c(-1, 1) * z * se_rd
+  )
+}
+d_res <- twoby2(d_table)
+
+d_summary <- tibble(
+  measure   = c("Relative risk (Male / Female)", "Odds ratio (Male / Female)",
+                "Risk difference (Male - Female)"),
+  estimate  = c(d_res$RR, d_res$OR, d_res$RD),
+  conf.low  = c(d_res$RR_CI[1], d_res$OR_CI[1], d_res$RD_CI[1]),
+  conf.high = c(d_res$RR_CI[2], d_res$OR_CI[2], d_res$RD_CI[2])
+)
+d_sig <- excludes_null(d_res$RR_CI[1], d_res$RR_CI[2], null = 1)
+
+d_age_tbl <- bind_rows(
+  mosaic::favstats(RIDAGEYR ~ sex, data = diabetics) |>
+    rename(group = sex) |> mutate(variable = "Sex", group = as.character(group)),
+  mosaic::favstats(RIDAGEYR ~ retinopathy, data = diabetics) |>
+    rename(group = retinopathy) |>
+    mutate(variable = "Retinopathy", group = paste("Retinopathy:", group))
+) |>
+  mutate(IQR = Q3 - Q1, .after = Q3) |>
+  select(variable, group, everything())
+
+# ---- Overview objects -------------------------------------------------------
+overview_tbl <- tibble(
+  analysis = c("A", "B", "C", "D"),
+  question = c(
+    "Among diabetics on pills, does reported LDL differ from the doctor's recommended LDL?",
+    "Do non-diabetic men have higher fasting glucose than women?",
+    "Does alcohol-use frequency affect fasting glucose in non-diabetic adults?",
+    "Is retinopathy (severe diabetes) more common in diabetic men than women?"
+  ),
+  method = c(
+    "Paired samples: bootstrap of the median difference",
+    "Two independent samples: Welch t-test",
+    "Four independent samples: one-way ANOVA + Tukey HSD",
+    "2 x 2 table: relative risk, odds ratio, risk difference"
+  ),
+  n = c(nrow(diqA), nrow(diqB), nrow(glu_C), nrow(diabetics)),
+  result = c(
+    paste0("Median difference (reported - recommended) = ",
+           fmt_ci(a_est$estimate, a_est$conf.low, a_est$conf.high, 1), " mg/dL"),
+    paste0("Mean difference (Male - Female) = ",
+           fmt_ci(b_tidy$estimate, b_tidy$conf.low, b_tidy$conf.high, 2), " mg/dL"),
+    paste0("ANOVA F(", c_anova$df[1], ", ", c_anova$df[2], ") = ", fmt(c_anova$statistic[1], 2),
+           ", ", fmt_p(c_p), "; ", nrow(c_sig_pairs), " of ", nrow(c_tukey),
+           " Tukey pairs significant"),
+    paste0("Relative risk (Male / Female) = ",
+           fmt_ci(d_res$RR, d_res$RR_CI[1], d_res$RR_CI[2], 2))
+  ),
+  conclusion = c(
+    if (a_sig) "Reported LDL differs from the recommended goal" else "No difference between reported and recommended LDL",
+    if (b_sig) paste0("Men have significantly ", b_dir, " fasting glucose") else "No significant sex difference in fasting glucose",
+    if (c_p < alpha) paste0("Groups differ; significant pairs: ", c_pairs_txt) else "No difference across alcohol groups",
+    if (d_sig) "Significant sex difference in retinopathy" else "No significant sex difference in retinopathy"
+  )
+)
+
+# ---- Codebook ---------------------------------------------------------------
+codebook <- tribble(
+  ~Variable, ~Description, ~Source,
+  "all_clean", "Merged NHANES data restricted to adults aged 21-79 who completed both the interview and the exam", "RIDSTATR = 2, RIDAGEYR",
+  "RIDAGEYR", "Age in years at screening", "P_DEMO",
+  "sex", "Female or Male", "RIAGENDR (P_DEMO)",
+  "LBXGLU", "Fasting plasma glucose (mg/dL)", "P_GLU",
+  "DIQ010", "Doctor told the participant they have diabetes (1 = Yes, 2 = No)", "P_DIQ",
+  "DIQ070", "Currently taking diabetic pills to lower blood sugar (1 = Yes)", "P_DIQ",
+  "diabetics", "Subjects with reported diabetes who also answered the retinopathy question (Analysis D cohort)", "DIQ010 = 1, DIQ080",
+  "reported_ldl", "LDL level reported by the subject (mg/dL); refused, don't know and missing answers removed", "DID320 (P_DIQ)",
+  "goal_ldl", "LDL level recommended by the doctor (mg/dL); refused, don't know and missing answers removed", "DID330 (P_DIQ)",
+  "alcohol_group", "Alcohol-use group, a factor with the four levels below (Analysis C)", "ALQ121, ALQ142 (P_ALQ)",
+  "  Nondrinker", "Have not had alcohol in the past 12 months (control group)", "ALQ121 = 0",
+  "  Social drinker", "Fewest days with 4 or 5 drinks in the past 12 months", "ALQ142 = 7 to 10",
+  "  Intermediate", "Middle range of days with 4 or 5 drinks in the past 12 months", "ALQ142 = 4 to 6",
+  "  Heavy drinker", "Most days with 4 or 5 drinks in the past 12 months", "ALQ142 = 1 to 3",
+  "retinopathy", "Retinopathy status of diabetic subjects. Yes = has retinopathy; No = does not have retinopathy", "DIQ080 (P_DIQ)"
+)
+```
+
+# Overview
+
+## Row {height=45%}
+
+```{r}
+#| content: valuebox
+#| title: "Adults analyzed (age 21-79)"
+list(icon = "people-fill", color = "white", value = fmt(nrow(all_clean), 0))
+```
+
+```{r}
+#| content: valuebox
+#| title: "A: median LDL difference (mg/dL)"
+list(icon = "capsule", color = "white", value = fmt(a_est$estimate, 1))
+```
+
+```{r}
+#| content: valuebox
+#| title: "B: glucose difference, male - female (mg/dL)"
+list(icon = "gender-ambiguous", color = "white", value = fmt(b_tidy$estimate, 1))
+```
+
+```{r}
+#| content: valuebox
+#| title: "C: ANOVA p-value"
+list(icon = "cup-straw", color = "white", value = fmt(c_p, 3))
+```
+
+```{r}
+#| content: valuebox
+#| title: "D: relative risk, male / female"
+list(icon = "eye-fill", color = "white", value = fmt(d_res$RR, 2))
+```
+
+## Row {height=60%}
+
+### Column {width=60%}
+
+```{r}
+#| title: "Results at a glance"
+overview_tbl |>
+  gt() |>
+  fmt_number(columns = n, decimals = 0) |>
+  cols_label(analysis = "Analysis", question = "Research question", method = "Method",
+             n = "n", result = "Key result", conclusion = "Conclusion") |>
+  cols_align(align = "left") |>
+  cols_align(align = "center", columns = c(analysis, n)) |>
+  tab_options(table.font.size = px(12), data_row.padding = px(4)) |>
+  tab_source_note(paste0("All intervals are ", ci_txt, "s."))
+```
+
+### Column {.tabset width=40%}
+
+::: {.card title="About this dashboard"}
+**Questions.** Using NHANES data on U.S. adults aged 21-79, this dashboard walks through four analyses:
+
+- **A.** Among diabetics on pills, does reported LDL differ from the LDL goal their doctor recommended?
+- **B.** Do non-diabetic men have higher fasting glucose than women?
+- **C.** Does alcohol-use frequency affect fasting glucose?
+- **D.** Is retinopathy (a marker of severe diabetes) more common in diabetic men than women?
+
+**How to use it.** Start with the headline numbers and the results table. Each *Analysis* page follows the same path: *Research question*, *About the data*, *Analysis*, and *Conclusion*. The *Codebook* page documents every variable and the sample flow.
+
+**Data.** NHANES 2017-March 2020 pre-pandemic files (P_DEMO, P_DIQ, P_GLU, P_ALQ). Dashboard last rendered `r format(Sys.time(), "%Y-%m-%d %H:%M %Z")`.
+:::
+
+```{r}
+#| title: "Sample size by analysis"
+#| fig-alt: "Bar chart of the number of adults included in each of the four analyses."
+ggplot(overview_tbl, aes(x = analysis, y = n)) +
+  geom_col(fill = "steelblue", width = 0.6) +
+  geom_text(aes(label = fmt(n, 0)), vjust = -0.4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(x = "Analysis", y = "Adults", title = "Adults included in each analysis")
+```
+
+# Analysis A {orientation="columns"}
+
+## Column {width=50%}
+
+### Row {height=30%}
+
+::: {.card title="Research question"}
+*Among diabetics who take diabetic pills, is there a difference between their reported LDL cholesterol and the LDL goal their doctor recommended?*
+
+Diabetic pills control blood sugar and may also influence other clinical measures such as LDL, which tends to be elevated in diabetes. The question is whether **reported LDL differs from the doctor's recommended LDL** in this group.
+
+**Design:** paired samples (each person has one reported and one recommended value).
+:::
+
+### Row {.tabset height=70%}
+
+::: {.card title="About the data"}
+**Cohort.** Diabetic adults who currently take diabetic pills (`DIQ070 = 1`) and gave both a reported and a recommended LDL value (refused, don't know and missing answers removed): **`r fmt(nrow(diqA), 0)` adults**.
+
+**Age.** LDL levels tend to rise with age, so the age mix matters when interpreting results. The age distribution is slightly left-skewed with a median of **`r a_age_med` years**.
+
+**Normality.** Reported LDL is right-skewed: the histogram and boxplot show extreme high values that curve the right tail of the Q-Q plot. Normality cannot be assumed (see the *Normality of reported LDL* tab).
+:::
+
+```{r}
+#| title: "Age distribution"
+#| fig-alt: "Histogram of subject ages in five-year bins with a dashed vertical line at the median age."
+ggplot(diqA, aes(x = RIDAGEYR)) +
+  geom_histogram(binwidth = 5, fill = "darkgreen", color = "black", alpha = 0.8) +
+  geom_vline(xintercept = a_age_med, color = "red", linetype = "dashed", linewidth = 0.9) +
+  annotate("text", x = a_age_med, y = Inf, label = paste0("Median = ", a_age_med),
+           color = "red", hjust = 1.1, vjust = 2.3, size = 4.5) +
+  labs(x = "Age (years)", y = "Count", title = "Age distribution of subjects") +
+  theme_minimal()
+```
+
+```{r}
+#| title: "Age summary"
+mosaic::favstats(~ RIDAGEYR, data = diqA) |>
+  mutate(IQR = Q3 - Q1, .after = Q3) |>
+  gt_fav()
+```
+
+```{r}
+#| title: "Normality of reported LDL"
+#| fig-alt: "Histogram with a normal curve, Q-Q plot and boxplot of reported LDL, showing a right-skewed distribution."
+a_hist <- ggplot(diqA, aes(x = reported_ldl)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 10, fill = "darkgreen", color = "black") +
+  stat_function(fun = dnorm,
+                args = list(mean = mean(diqA$reported_ldl), sd = sd(diqA$reported_ldl)),
+                color = "red", linewidth = 1) +
+  labs(title = "Histogram of reported LDL", x = "Reported LDL (mg/dL)", y = "Density")
+
+a_qq <- ggplot(diqA, aes(sample = reported_ldl)) +
+  stat_qq() + stat_qq_line() +
+  labs(title = "Q-Q plot of reported LDL", x = "Theoretical quantiles", y = "Sample quantiles")
+
+a_box <- ggplot(diqA, aes(x = "", y = reported_ldl)) +
+  geom_boxplot(fill = "darkgreen", alpha = 0.7, width = 0.4, outlier.alpha = 0.5) +
+  labs(x = NULL, y = "Reported LDL (mg/dL)", title = "Boxplot of reported LDL")
+
+a_hist + (a_qq / a_box) &
+  theme(plot.title  = element_text(size = 10, face = "bold"),
+        axis.title  = element_text(size = 8),
+        plot.margin = margin(10, 20, 10, 20))
+```
+
+## Column {width=50%}
+
+### Row {height=50%}
+
+```{r}
+#| title: "Reported vs. recommended LDL"
+#| fig-alt: "Side-by-side boxplots of reported LDL and doctor-recommended LDL for diabetics who take diabetic pills."
+diqA |>
+  pivot_longer(c(reported_ldl, goal_ldl), names_to = "type", values_to = "ldl") |>
+  mutate(type = recode(type, reported_ldl = "Reported LDL", goal_ldl = "Recommended LDL")) |>
+  ggplot(aes(x = type, y = ldl, fill = type)) +
+  geom_boxplot(alpha = 0.7, outlier.alpha = 0.4, show.legend = FALSE) +
+  scale_fill_manual(values = c("Reported LDL" = "steelblue", "Recommended LDL" = "darkgreen")) +
+  labs(x = NULL, y = "LDL (mg/dL)")
+```
+
+### Row {.tabset height=50%}
+
+::: {.card title="Analysis"}
+Reported LDL is right-skewed, so comparing **medians** is more appropriate than comparing means: the median resists outliers.
+
+The paired t-test compares means, not medians, so I use a **bootstrap** instead. For each person I compute the difference (reported minus recommended LDL), resample those differences 10,000 times, and take the median of each resample. The 5th and 95th percentiles of the resampled medians give the 90% confidence interval. The sample is larger than 30, which supports the bootstrap.
+:::
+
+```{r}
+#| title: "Estimate"
+a_est |>
+  gt() |>
+  fmt_number(columns = everything(), decimals = 2) |>
+  cols_label(estimate = "Observed median difference", conf.low = "90% CI low",
+             conf.high = "90% CI high") |>
+  tab_source_note("Difference = reported minus recommended LDL (mg/dL). Bootstrap percentile interval, 10,000 resamples.")
+```
+
+::: {.card title="Conclusion"}
+Bootstrap median difference (reported - recommended LDL): **`r fmt_ci(a_est$estimate, a_est$conf.low, a_est$conf.high, 2)` mg/dL**. The interval `r ci_position(a_est$conf.low, a_est$conf.high)` zero.
+
+`r if (a_sig) "At the 90% confidence level, the median reported LDL differs from the median LDL goal recommended by doctors." else "At the 90% confidence level, there is no difference between the median reported and recommended LDL. This suggests that diabetics on pills are, on average, managing their LDL close to their doctor's goal, one of the main clinical outcomes in diabetes. Because there is no untreated comparison group, this cannot show that the pill alone is responsible."`
+:::
+
+# Analysis B {orientation="columns"}
+
+## Column {width=50%}
+
+### Row {height=30%}
+
+::: {.card title="Research question"}
+*Do men have higher baseline fasting plasma glucose levels than women?*
+
+Diabetes is more prevalent in U.S. men than women, and fasting plasma glucose is one of the main clinical measures of diabetes risk. This analysis asks whether there is an **intrinsic sex difference in fasting glucose** among people without diabetes.
+
+**Design:** two independent samples (men vs. women).
+:::
+
+### Row {.tabset height=70%}
+
+::: {.card title="About the data"}
+**Cohort.** Non-diabetic adults (`DIQ010 = 2`) with a fasting glucose measurement: **`r fmt(sum(diqB$sex == "Male"), 0)` men** and **`r fmt(sum(diqB$sex == "Female"), 0)` women**.
+
+**Age.** Age has not been shown to influence fasting glucose, so the age distribution of the two groups is not a concern here.
+
+**Normality.** Both distributions are strongly right-skewed (boxplot, Q-Q plots, histograms), possibly because of undiagnosed diabetics who are not captured by the questionnaire. Normality cannot be assumed for either group.
+:::
+
+```{r}
+#| title: "Group summary"
+mosaic::favstats(LBXGLU ~ sex, data = diqB) |>
+  mutate(IQR = Q3 - Q1, .after = Q3) |>
+  rename(Sex = sex) |>
+  gt_fav()
+```
+
+```{r}
+#| title: "Normality checks"
+#| fig-alt: "Boxplot, Q-Q plots and histograms with normal curves of fasting glucose for men and women; both are strongly right-skewed."
+b_stats <- diqB |>
+  group_by(sex) |>
+  summarise(mean_glu = mean(LBXGLU), sd_glu = sd(LBXGLU), .groups = "drop")
+b_range <- range(diqB$LBXGLU)
+b_curves <- b_stats |>
+  rowwise() |>
+  reframe(
+    sex     = sex,
+    glucose = seq(b_range[1], b_range[2], length.out = 200),
+    density = dnorm(glucose, mean = mean_glu, sd = sd_glu)
+  )
+
+b_hist <- ggplot(diqB, aes(x = LBXGLU)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 3, fill = "darkgreen", color = NA) +
+  geom_line(data = b_curves, aes(x = glucose, y = density), color = "red", linewidth = 1) +
+  facet_wrap(~ sex, ncol = 1) +
+  labs(x = "Fasting plasma glucose (mg/dL)", y = "Density",
+       title = "Fasting glucose distribution by sex") +
+  coord_cartesian(xlim = b_range)
+
+b_qq <- ggplot(diqB, aes(sample = LBXGLU)) +
+  stat_qq(size = 0.6, alpha = 0.7) + stat_qq_line(color = "red") +
+  facet_wrap(~ sex, ncol = 1) +
+  labs(x = "Theoretical quantiles", y = "Sample quantiles\n(fasting glucose, mg/dL)",
+       title = "Q-Q plot of fasting glucose by sex")
+
+b_box <- ggplot(diqB, aes(x = sex, y = LBXGLU, fill = sex)) +
+  geom_boxplot(alpha = 0.7, outlier.alpha = 0.4, show.legend = FALSE) +
+  scale_fill_manual(values = pal_sex) +
+  scale_x_discrete(limits = c("Male", "Female")) +
+  labs(x = NULL, y = "Fasting plasma glucose (mg/dL)", title = "Fasting glucose by sex") +
+  coord_flip()
+
+(b_box / (b_qq + b_hist)) &
+  theme(plot.title  = element_text(size = 8, face = "bold"),
+        axis.title  = element_text(size = 8),
+        plot.margin = margin(10, 20, 10, 20))
+```
+
+## Column {width=50%}
+
+### Row {height=50%}
+
+```{r}
+#| title: "Fasting plasma glucose in non-diabetic subjects, by sex"
+#| fig-alt: "Violin plots with boxplots of fasting plasma glucose for non-diabetic men and women."
+ggplot(diqB, aes(x = sex, y = LBXGLU, fill = sex)) +
+  geom_violin() +
+  geom_boxplot(width = 0.25, alpha = 0.6, show.legend = FALSE) +
+  scale_fill_manual(values = pal_sex) +
+  coord_flip() +
+  labs(x = NULL, y = "Fasting plasma glucose (mg/dL)", fill = NULL) +
+  theme_minimal()
+```
+
+### Row {.tabset height=50%}
+
+::: {.card title="Analysis"}
+Normality cannot be assumed, but both groups are far larger than 30, so a t-test comparing the **means** of the two independent samples is still reasonable. I use **Welch's t-test**, which does not assume equal variances, with a 90% confidence interval for the difference in means (male minus female).
+:::
+
+```{r}
+#| title: "Estimates"
+b_tidy |>
+  transmute(mean_male = estimate1, mean_female = estimate2, diff = estimate,
+            low = conf.low, high = conf.high, p = p.value) |>
+  gt() |>
+  fmt_number(columns = c(mean_male, mean_female, diff, low, high), decimals = 2) |>
+  fmt_number(columns = p, decimals = 4) |>
+  cols_label(mean_male = "Mean, Male", mean_female = "Mean, Female",
+             diff = "Difference (M - F)", low = "90% CI low", high = "90% CI high", p = "p-value") |>
+  tab_source_note("Fasting plasma glucose in mg/dL; Welch two-sample t-test.")
+```
+
+::: {.card title="Conclusion"}
+Mean fasting glucose is **`r fmt(b_tidy$estimate1, 1)` mg/dL in men** vs. **`r fmt(b_tidy$estimate2, 1)` mg/dL in women**, a difference of **`r fmt_ci(b_tidy$estimate, b_tidy$conf.low, b_tidy$conf.high, 2)` mg/dL** (`r fmt_p(b_tidy$p.value)`). The interval `r ci_position(b_tidy$conf.low, b_tidy$conf.high)` zero.
+
+`r if (b_sig) paste0("At the 90% confidence level, there is a statistically significant difference in mean baseline fasting glucose between non-diabetic men and women, with men ", b_dir, ".") else "At the 90% confidence level, there is no statistically significant difference in mean baseline fasting glucose between non-diabetic men and women."`
+
+`r b_note`
+:::
+
+# Analysis C {orientation="columns"}
+
+## Column {width=50%}
+
+### Row {height=30%}
+
+::: {.card title="Research question"}
+*Does frequent alcohol consumption affect baseline fasting plasma glucose level?*
+
+Alcohol consumption is a well-known risk factor for diabetes. This analysis asks whether **how often someone drinks heavily is associated with their baseline fasting glucose**.
+
+**Design:** four independent groups compared with a one-way ANOVA.
+:::
+
+### Row {.tabset height=70%}
+
+::: {.card title="About the data"}
+**Groups.** Subjects are grouped by how many days in the past 12 months they had 4 or 5 drinks (`ALQ142`): **Social drinker** (fewest days), **Intermediate**, and **Heavy drinker** (most days). **Nondrinkers** (`ALQ121 = 0`, no alcohol in the past 12 months) are the control group.
+
+**Cohort.** Non-diabetic adults only, so glucose is not driven up by diabetes. Group sizes: `r c_counts_txt`.
+
+**Spread.** Group centers are similar (means and medians near 100 mg/dL) and IQRs are alike, so differences come mostly from the tails and outliers (see *Group summary*).
+
+**Normality.** The nondrinker, social and intermediate groups are strongly right-skewed (sharp upward curve in the Q-Q plots). Only the heavy-drinker group looks roughly normal.
+:::
+
+```{r}
+#| title: "Group summary"
+mosaic::favstats(LBXGLU ~ alcohol_group, data = glu_C) |>
+  mutate(IQR = Q3 - Q1, .after = Q3) |>
+  rename(Group = alcohol_group) |>
+  gt_fav() |>
+  tab_source_note("Fasting plasma glucose (mg/dL) by alcohol group, non-diabetic adults.")
+```
+
+```{r}
+#| title: "Normality checks"
+#| fig-alt: "Boxplots, Q-Q plots and histograms with normal curves of fasting glucose for four alcohol-use groups; three groups are right-skewed."
+c_stats <- glu_C |>
+  group_by(alcohol_group) |>
+  summarise(mean_glu = mean(LBXGLU), sd_glu = sd(LBXGLU), .groups = "drop")
+c_range <- range(glu_C$LBXGLU)
+c_curves <- c_stats |>
+  rowwise() |>
+  reframe(
+    alcohol_group = alcohol_group,
+    glucose = seq(c_range[1], c_range[2], length.out = 200),
+    density = dnorm(glucose, mean = mean_glu, sd = sd_glu)
+  )
+
+c_box <- ggplot(glu_C, aes(x = alcohol_group, y = LBXGLU, fill = alcohol_group)) +
+  geom_boxplot(alpha = 0.6, show.legend = FALSE) +
+  scale_fill_manual(values = pal_alcohol) +
+  labs(x = NULL, y = "Fasting plasma glucose (mg/dL)",
+       title = "Fasting glucose by alcohol-consumption group") +
+  coord_flip()
+
+c_qq <- ggplot(glu_C, aes(sample = LBXGLU)) +
+  stat_qq(size = 0.6, alpha = 0.7) + stat_qq_line() +
+  facet_wrap(~ alcohol_group) +
+  labs(title = "Q-Q plots of fasting plasma glucose",
+       x = "Theoretical quantiles", y = "Sample quantiles")
+
+c_hist <- ggplot(glu_C, aes(x = LBXGLU)) +
+  geom_histogram(aes(y = after_stat(density), fill = alcohol_group), binwidth = 3, color = NA) +
+  geom_line(data = c_curves, aes(x = glucose, y = density), color = "black", linewidth = 0.7) +
+  scale_fill_manual(values = pal_alcohol) +
+  coord_cartesian(xlim = c(20, 180)) +
+  facet_wrap(~ alcohol_group) +
+  labs(title = "Fasting plasma glucose histograms",
+       x = "Fasting plasma glucose (mg/dL)", y = "Density")
+
+c_box / (c_qq + c_hist) +
+  plot_layout(heights = c(1, 2)) &
+  theme_minimal() &
+  theme(legend.position = "none",
+        plot.title  = element_text(size = 8, face = "bold"),
+        axis.title  = element_text(size = 8),
+        plot.margin = margin(10, 20, 10, 20))
+```
+
+## Column {width=50%}
+
+### Row {height=50%}
+
+```{r}
+#| title: "Fasting plasma glucose distribution by alcohol group"
+#| fig-alt: "Violin plots with boxplots of fasting plasma glucose for nondrinkers, social drinkers, intermediate drinkers and heavy drinkers."
+ggplot(glu_C, aes(x = alcohol_group, y = LBXGLU, fill = alcohol_group)) +
+  geom_violin(alpha = 0.7, trim = TRUE) +
+  scale_fill_manual(values = pal_alcohol) +
+  geom_boxplot(width = 0.2, fill = "black", outlier.alpha = 0.4) +
+  labs(x = NULL, y = "Fasting plasma glucose (mg/dL)") +
+  coord_flip() +
+  theme(legend.position = "none")
+```
+
+### Row {.tabset height=50%}
+
+::: {.card title="Analysis"}
+ANOVA assumes normality within each group. That assumption is not satisfied here (3 of 4 groups are right-skewed), but every group is large (`r c_counts_txt`), so the non-normality is tolerable. I therefore run a **one-way ANOVA** followed by pre-planned **Tukey HSD** pairwise comparisons at the 90% confidence level.
+:::
+
+```{r}
+#| title: "ANOVA"
+c_anova |>
+  mutate(term = if_else(term == "alcohol_group", "Alcohol group", term)) |>
+  gt() |>
+  fmt_number(columns = c(sumsq, meansq), decimals = 1) |>
+  fmt_number(columns = statistic, decimals = 2) |>
+  fmt_number(columns = p.value, decimals = 4) |>
+  fmt_number(columns = df, decimals = 0) |>
+  sub_missing(missing_text = "-") |>
+  cols_label(term = "Source", df = "df", sumsq = "Sum sq", meansq = "Mean sq",
+             statistic = "F", p.value = "p") |>
+  tab_source_note("One-way ANOVA: fasting plasma glucose by alcohol-consumption group.")
+```
+
+```{r}
+#| title: "Tukey HSD"
+c_tukey |>
+  select(contrast, estimate, conf.low, conf.high, adj.p.value) |>
+  gt() |>
+  fmt_number(columns = c(estimate, conf.low, conf.high), decimals = 2) |>
+  fmt_number(columns = adj.p.value, decimals = 3) |>
+  cols_label(contrast = "Comparison", estimate = "Mean diff.", conf.low = "90% CI low",
+             conf.high = "90% CI high", adj.p.value = "Adjusted p") |>
+  tab_source_note("Tukey HSD pairwise comparisons of fasting plasma glucose (mg/dL), 90% CI.")
+```
+
+::: {.card title="Conclusion"}
+One-way ANOVA: F = `r fmt(c_anova$statistic[1], 2)` on `r c_anova$df[1]` and `r c_anova$df[2]` df, `r fmt_p(c_p)`. `r if (c_p < alpha) "There is a statistically significant difference in fasting glucose across alcohol-consumption groups." else "There is no statistically significant difference in fasting glucose across alcohol-consumption groups."`
+
+Tukey HSD pairs whose 90% interval excludes zero: **`r c_pairs_txt`** (`r nrow(c_sig_pairs)` of `r nrow(c_tukey)`). `r if (c_unexpected) "In the context of the research question, alcohol consumption does appear to affect fasting glucose, but only at high consumption frequency." else ""`
+
+`r c_note`
+:::
+
+# Analysis D {orientation="columns"}
+
+## Column {width=50%}
+
+### Row {height=30%}
+
+::: {.card title="Research question"}
+*Is severe diabetes more common in diabetic males than in diabetic females?*
+
+Diabetes is more prevalent in U.S. males, but it is unclear whether sex influences disease progression or severity. Diabetic retinopathy is used clinically to gauge severity and end-organ damage, so I use **retinopathy as a marker of severe diabetes** and compare its occurrence between the sexes.
+
+**Design:** 2 x 2 table (sex by retinopathy status) among diabetics.
+:::
+
+### Row {.tabset height=70%}
+
+::: {.card title="About the data"}
+**Cohort.** Adults who reported diabetes (`DIQ010 = 1`) and answered the retinopathy question (`DIQ080`): **`r fmt(nrow(diabetics), 0)` diabetics**, grouped by sex (Male/Female) and retinopathy status (Yes/No).
+
+**Age.** Age is a prominent driver of retinopathy, so the sub-groups should have similar age distributions. Median ages across the sex and retinopathy sub-groups range from **`r fmt(min(d_age_tbl$median), 1)` to `r fmt(max(d_age_tbl$median), 1)` years**, with IQRs from `r fmt(min(d_age_tbl$IQR), 1)` to `r fmt(max(d_age_tbl$IQR), 1)`. Similar centers and spreads control for age as a contributor to retinopathy, which strengthens the analysis of sex.
+:::
+
+```{r}
+#| title: "Age distribution"
+#| fig-alt: "Boxplots of age for male and female diabetics, and for diabetics with and without retinopathy; the distributions are similar."
+d_age_sex <- ggplot(diabetics, aes(x = sex, y = RIDAGEYR, fill = sex)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_fill_manual(values = pal_sex) +
+  labs(title = "Age by sex", x = "Sex", y = "Age (years)")
+
+d_age_retino <- ggplot(diabetics, aes(x = retinopathy, y = RIDAGEYR, fill = retinopathy)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_fill_manual(values = pal_retino) +
+  labs(title = "Age by retinopathy status", x = "Retinopathy status", y = "Age (years)")
+
+(d_age_sex | d_age_retino) &
+  theme(plot.title  = element_text(size = 10, face = "bold"),
+        plot.margin = margin(10, 20, 10, 20))
+```
+
+```{r}
+#| title: "Age summary"
+gt_fav(d_age_tbl, groupname_col = "variable", rowname_col = "group") |>
+  tab_source_note("Age (years) by sex and by retinopathy status, diabetic adults.")
+```
+
+## Column {width=50%}
+
+### Row {height=50%}
+
+```{r}
+#| title: "Retinopathy by sex among diabetics"
+#| fig-alt: "Stacked percentage bars showing the share of diabetic men and women with and without retinopathy, labeled with percentages and counts."
+diabetics |>
+  count(sex, retinopathy) |>
+  group_by(sex) |>
+  mutate(pct = n / sum(n)) |>
+  ungroup() |>
+  ggplot(aes(x = sex, y = pct, fill = retinopathy)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = paste0(round(100 * pct, 1), "% (n = ", n, ")")),
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_manual(values = pal_retino) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = NULL, y = "Share of diabetics", fill = "Retinopathy")
+```
+
+### Row {.tabset height=50%}
+
+::: {.card title="Analysis"}
+I compare the risk of retinopathy in men and women using the **relative risk** (male risk / female risk), the **odds ratio**, and the **risk difference** (male risk - female risk), each with a 90% confidence interval.
+
+These comparisons need independent observations, with each person counted exactly once; the data cleaning satisfies this. They also rely on approximate normality of the estimates, which is not a concern given the large size of each group.
+:::
+
+```{r}
+#| title: "2 x 2 table"
+d_pct <- d_table |> addmargins() |> as.data.frame.matrix()
+d_totals <- d_pct["Sum", ]
+d_display <- d_pct
+for (col in c("Male", "Female")) {
+  d_display[[col]] <- paste0(d_pct[[col]], " (", round(100 * d_pct[[col]] / d_totals[[col]], 1), "%)")
+}
+d_display$Sum <- paste0(d_pct$Sum, " (", round(100 * d_pct$Sum / d_totals$Sum, 1), "%)")
+
+d_display |>
+  rownames_to_column("Retinopathy") |>
+  mutate(Retinopathy = replace(Retinopathy, Retinopathy == "Sum", "Total")) |>
+  gt() |>
+  cols_label(Sum = "Total") |>
+  cols_align(align = "center", columns = c(Male, Female, Sum)) |>
+  tab_spanner(label = "Sex", columns = c(Male, Female)) |>
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_body(rows = Retinopathy == "Total")) |>
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_body(columns = Sum)) |>
+  tab_source_note("Retinopathy by sex among diabetics, count (column %).")
+```
+
+```{r}
+#| title: "RR, OR, RD"
+d_summary |>
+  gt() |>
+  fmt_number(columns = c(estimate, conf.low, conf.high), decimals = 3) |>
+  cols_label(measure = "Measure", estimate = "Estimate",
+             conf.low = "90% CI low", conf.high = "90% CI high") |>
+  tab_source_note("Null value: 1 for relative risk and odds ratio, 0 for risk difference.")
+```
+
+::: {.card title="Conclusion"}
+Retinopathy occurs in **`r fmt(100 * d_res$risk_male, 1)`%** of diabetic men vs. **`r fmt(100 * d_res$risk_female, 1)`%** of diabetic women.
+
+- Relative risk: **`r fmt_ci(d_res$RR, d_res$RR_CI[1], d_res$RR_CI[2], 2)`**. The interval `r ci_position(d_res$RR_CI[1], d_res$RR_CI[2], null = 1)` 1.
+- Odds ratio: **`r fmt_ci(d_res$OR, d_res$OR_CI[1], d_res$OR_CI[2], 2)`**. The interval `r ci_position(d_res$OR_CI[1], d_res$OR_CI[2], null = 1)` 1.
+- Risk difference: **`r fmt_ci(100 * d_res$RD, 100 * d_res$RD_CI[1], 100 * d_res$RD_CI[2], 1)` percentage points**. The interval `r ci_position(d_res$RD_CI[1], d_res$RD_CI[2])` 0.
+
+`r if (d_sig) "At the 90% confidence level, there is a statistically significant sex difference in the risk of severe diabetes among diabetics." else "At the 90% confidence level, there is no statistically significant sex difference in the risk of severe diabetes among diabetics."`
+
+**Limitations.** The data do not account for confounders such as other health conditions, food access, or healthcare access. Retinopathy is a common feature of worsening diabetes but not the defining feature of severe diabetes, so sex cannot be ruled out as an intrinsic contributor to differences in severity.
+:::
+
+# Codebook
+
+## Row {height=62%}
+
+```{r}
+#| title: "Codebook"
+codebook |>
+  gt() |>
+  cols_label(Variable = "Variable", Description = "Description", Source = "NHANES source") |>
+  cols_align(align = "left") |>
+  tab_style(style = cell_text(font = "monospace"),
+            locations = cells_body(columns = Variable))
+```
+
+## Row {height=38%}
+
+```{r}
+#| title: "Sample flow"
+tibble(
+  Step = c("All participants in P_DEMO",
+           "Interviewed and examined, age 21-79 (all_clean)",
+           "A: diabetics on pills with reported and recommended LDL",
+           "B: non-diabetics with fasting glucose",
+           "C: non-diabetics in an alcohol group with fasting glucose",
+           "D: diabetics with known retinopathy status"),
+  Participants = c(nrow(demo), nrow(all_clean), nrow(diqA), nrow(diqB), nrow(glu_C), nrow(diabetics))
+) |>
+  gt() |>
+  fmt_number(columns = Participants, decimals = 0) |>
+  cols_align(align = "left", columns = Step)
+```
+
+::: {.card title="About the data"}
+**Source.** National Health and Nutrition Examination Survey, 2017-March 2020 pre-pandemic files: P_DEMO (demographics), P_DIQ (diabetes), P_GLU (fasting glucose), and P_ALQ (alcohol use), retrieved with the nhanesA package and merged on `SEQN`.
+
+**Cleaning.** The four files are joined onto the demographic file, then restricted to participants who completed both the interview and the exam (`RIDSTATR = 2`) and are aged 21-79. Each analysis then applies its own filters (see *Sample flow*).
+
+**Caveats.** Survey weights are not used, so results describe this sample rather than the U.S. population. The data are cross-sectional, and confounders such as other health conditions, medication use and undiagnosed diabetes are not controlled for. All intervals use a 90% confidence level.
+:::
