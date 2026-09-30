@@ -1,11 +1,10 @@
 ---
-title: Projects
+layout: page
 ---
 
 # Publications
 
 <a href="https://doi.org/10.1073/pnas.2514355123" target="_blank"> Ubiquitin-specific peptidase-19 links TDP-43 aggregation to ER stress</a> <br>
-
 Y. Yan, X. Wang, H. Jeon, T.R. Kee, **K.D. Tran**, H. Lee, X. Zhao, T. Liu, S.S. Wing, J.A. Woo, & D.E. Kang,  Ubiquitin-specific peptidase-19 links TDP-43 aggregation to ER stress, Proc. Natl. Acad. Sci. U.S.A. 123 (11) e2514355123, https://doi.org/10.1073/pnas.2514355123 (2026).
 
 ----

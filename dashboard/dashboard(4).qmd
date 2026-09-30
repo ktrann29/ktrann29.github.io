@@ -4,7 +4,6 @@ author: "Khoi Tran"
 date-modified: last-modified
 format:
   dashboard:
-    theme: [pulse, html/styles.scss]
     orientation: rows
     include-in-header:
       text: |
@@ -291,7 +290,7 @@ codebook <- tribble(
 
 # Overview
 
-## Row {height=45%}
+## Row {height=55%}
 
 ```{r}
 #| content: valuebox
