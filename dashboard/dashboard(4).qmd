@@ -1,5 +1,7 @@
 ---
-title: Dashboard
+title: "Study 1"
+author: "Khoi Tran"
+date-modified: last-modified
 format:
   dashboard:
     theme: [pulse, html/styles.scss]
@@ -28,7 +30,8 @@ execute:
   echo: false
   warning: false
   message: false
----  
+---
+
 ```{r}
 #| label: setup
 #| include: false

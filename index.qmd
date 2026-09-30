@@ -1,5 +1,5 @@
 ---
-title: "Khoi Tran"
+title: "About"
 about:
   template: jolla
   id: about-block
