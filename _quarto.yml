@@ -20,7 +20,9 @@ website:
         href: dashboard/index.qmd
       - text: "CV"
         href: cv/index.qmd
-    
+      - text: "Study 1"
+        href: dashboard/index.qmd
+        
     # your social media handles
     right:
       - icon: linkedin
